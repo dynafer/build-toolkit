@@ -12,7 +12,7 @@ module.exports = async(runner, config) => {
   /**
    * runner: {
    *     Command,
-   *    Rollup,
+   *     Rollup,
    *     Sass,
    *     Task
    * }
