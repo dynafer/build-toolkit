@@ -1,0 +1,26 @@
+{
+	"root": true,
+	"extends": [
+		"plugin:@finer-group/base"
+	],
+	"parserOptions": {
+		"project": "tsconfig.json",
+		"sourceType": "module"
+	},
+	"ignorePatterns": ["*.js", "*.json", "build/**/*.ts"],
+	"rules": {
+		"@typescript-eslint/no-misused-promises": "off"
+	},
+	"settings": {
+		"import/parsers": {
+		  	"@typescript-eslint/parser": [".ts"]
+		},
+		"import/extensions": [".ts"],
+		"import/resolver": {
+			"typescript": {
+				"alwaysTryTypes": true,
+				"project":  "**/tsconfig.json"
+			}
+		}
+	}
+}

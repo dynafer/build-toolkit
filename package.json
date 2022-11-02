@@ -1,0 +1,36 @@
+{
+  "name": "@dynafer/build-toolkit",
+  "version": "0.1.6",
+  "author": "Dynafer",
+  "bin": {
+    "build-toolkit": "bin/build-toolkit.js"
+  },
+  "scripts": {
+    "prepublishOnly": "tsc -b",
+    "lint": "eslint . --ext .ts"
+  },
+  "devDependencies": {
+    "@finer-group/eslint-plugin": "^0.0.4",
+    "@types/node": "^18.11.4",
+    "@types/uglify-js": "^3.17.1",
+    "eslint": "^8.26.0",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.3"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "rollup": "^3.2.3",
+    "sass": "^1.55.0",
+    "uglify-js": "^3.17.4"
+  },
+  "main": "build/lib/BuildToolkit.js",
+  "module": "build/lib/BuildToolkit.js", 
+  "types": "build/lib/BuildToolkit.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "license": "MIT"
+}
