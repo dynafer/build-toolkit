@@ -1,0 +1,31 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"rootDir": "ts",
+		"outDir": "build/lib",
+		"tsBuildInfoFile": "build/tsconfig.tsbuildinfo",
+		"strict": true,
+		"suppressImplicitAnyIndexErrors": true,
+		"composite": true,
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"preserveConstEnums": true,
+		"strictFunctionTypes": true,
+		"strictBindCallApply": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": true,
+		"noImplicitAny": true,
+		"alwaysStrict": true,
+		"removeComments": true,
+		"importHelpers": true,
+		"forceConsistentCasingInFileNames": true,
+		"esModuleInterop": true,
+		"module": "CommonJS",
+		"target": "ES6",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"lib": ["es2017"]
+	},
+	"include": ["ts/**/*.ts"]
+}
