@@ -1,6 +1,6 @@
 {
   "name": "@dynafer/build-toolkit",
-  "version": "0.1.6",
+  "version": "1.0.0",
   "author": "Dynafer",
   "bin": {
     "build-toolkit": "bin/build-toolkit.js"
