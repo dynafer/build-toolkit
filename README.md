@@ -9,20 +9,20 @@ $ yarn add -D @dynafer/build-toolkit
 ### 1. Create __build.config.js__ in your working directory
 ```javascript
 module.exports = async(runner, config) => {
-	/**
-	 * runner: {
-	 * 		Command,
-	 *  	Rollup,
-	 * 		Sass,
-	 * 		Task
-	 * }
-	 * config: {
-	 * 		BasePath,
-	 * 		WatchDir,
-	 * 		Mode,
-	 * }
-	 */
-	...
+  /**
+   * runner: {
+   *     Command,
+   *    Rollup,
+   *     Sass,
+   *     Task
+   * }
+   * config: {
+   *     BasePath,
+   *     WatchDir,
+   *     Mode,
+   * }
+   */
+  ...
 };
 ```
 ### 2. After setting the file
@@ -52,100 +52,100 @@ $ yarn run build-toolkit -w <directory>
 ### 1. Command
 ```javascript
 module.exports = async(runner, config) => {
-	...
-	// Run setting must include 'command'
-	await runner.Command.Run({
-		command: 'yarn run eslint'
-	});
+  ...
+  // Run setting must include 'command'
+  await runner.Command.Run({
+    command: 'yarn run eslint'
+  });
 
-	// If you want to move to working directory
-	await runner.Command.Run({
-		cd: '<directory path>'
-		command: '<command>'
-	});
+  // If you want to move to working directory
+  await runner.Command.Run({
+    cd: '<directory path>'
+    command: '<command>'
+  });
 
-	// If you don't want to run the command on watching
-	await runner.Command.Run({
-		watch: false,
-		command: '<command>'
-	});
-	...
+  // If you don't want to run the command on watching
+  await runner.Command.Run({
+    watch: false,
+    command: '<command>'
+  });
+  ...
 };
 ```
 ### 2. Rollup (Using **Rollup.js** module)
 ```javascript
 module.exports = async(runner, config) => {
-	...
-	const singleConfig = {
-		// Rollup.js Configuration
-	};
+  ...
+  const singleConfig = {
+    // Rollup.js Configuration
+  };
 
-	const multipleConfigs = [
-		{
-			// Rollup.js Configuration
-		},
-		...
-	];
+  const multipleConfigs = [
+    {
+      // Rollup.js Configuration
+    },
+    ...
+  ];
 
-	const createUglifyRollup = {
-		...
-		output: {
-			...
-			createUglified: true,
-			...
-		},
-		...
-	}
+  const createUglifyRollup = {
+    ...
+    output: {
+      ...
+      createUglified: true,
+      ...
+    },
+    ...
+  }
 
-	runner.Rollup.Register(singleConfig);
-	runner.Rollup.Register(multipleConfigs);
-	runner.Rollup.Register(createUglifyRollup);
+  runner.Rollup.Register(singleConfig);
+  runner.Rollup.Register(multipleConfigs);
+  runner.Rollup.Register(createUglifyRollup);
 
-	await runner.Rollup.Run();
-	...
+  await runner.Rollup.Run();
+  ...
 };
 ```
 ### 3. Sass (Using **sass** module)
 ```javascript
 module.exports = async(runner, config) => {
-	...
-	const singleConfig = {
-		input: '<scss file path>',
-		output: '<output file path>',
-		compressed: false
-	};
+  ...
+  const singleConfig = {
+    input: '<scss file path>',
+    output: '<output file path>',
+    compressed: false
+  };
 
-	const multipleConfigs = [
-		{
-			input: '<scss file path>',
-			output: '<output file path>',
-			compressed: true
-		},
-		{
-			input: '<scss file path>',
-			output: '<output file path>',
-			compressed: false
-		},
-		...
-	];
+  const multipleConfigs = [
+    {
+      input: '<scss file path>',
+      output: '<output file path>',
+      compressed: true
+    },
+    {
+      input: '<scss file path>',
+      output: '<output file path>',
+      compressed: false
+    },
+    ...
+  ];
 
-	await runner.Sass.Run(singleConfig);
-	await runner.Sass.Run(multipleConfigs);
-	...
+  await runner.Sass.Run(singleConfig);
+  await runner.Sass.Run(multipleConfigs);
+  ...
 };
 ```
 ### 4. Task
 ```javascript
 module.exports = async(runner, config) => {
-	...
-	const taskRunner = async(config) => {
-		// any task...
-	};
+  ...
+  const taskRunner = async(config) => {
+    // any task...
+  };
 
-	await runner.Task.Run(taskRunner);
+  await runner.Task.Run(taskRunner);
 
-	// If you don't want to run the task on watching
-	await runner.Task.Run(taskRunner, false);
-	...
+  // If you don't want to run the task on watching
+  await runner.Task.Run(taskRunner, false);
+  ...
 };
 ```
