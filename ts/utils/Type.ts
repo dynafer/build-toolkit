@@ -1,5 +1,5 @@
 export interface IClassConstructor<T> {
-	new (): T;
+	new(): T;
 	prototype: T;
 }
 

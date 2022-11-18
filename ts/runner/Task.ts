@@ -4,11 +4,11 @@ import System from '../utils/System';
 import * as Type from '../utils/Type';
 
 export interface ITask {
-	(): Promise<void>
+	(): Promise<void>;
 }
 
 export interface ITaskRunner {
-	readonly Run: (task: ITask, watch?: boolean) => void;
+	readonly Run: (task: ITask, watch?: boolean) => void,
 }
 
 const TaskRunner = (): ITaskRunner => {

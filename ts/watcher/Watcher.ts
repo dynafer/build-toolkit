@@ -9,20 +9,25 @@ import { LoggerConstructor, ELogColour } from '../utils/Logger';
 import System from '../utils/System';
 import * as Type from '../utils/Type';
 
-export const Watcher = () => {
+export interface IWatcher {
+	Register: (toolkit: IToolkit, runner: TRunner) => void,
+}
+
+export const Watcher = (): IWatcher => {
 	const logger = LoggerConstructor('Watcher');
 	logger.UseLoggerManually();
 
 	const watchPath = fs.existsSync(Config.WatchDir) ? Config.WatchDir : path.resolve(Config.BasePath, Config.WatchDir);
 	if (!fs.existsSync(watchPath)) logger.Throw('Directory to watch doesn\'t exist');
-	let lastChanged: Date;
+	let lastChanged: number;
 	let bWorking: boolean = false;
 	let toolkitInstance: IToolkit;
 	let runnerInstance: TRunner;
 
 	const logWatching = () => logger.Log('Watching files...', ELogColour.Green);
 
-	const update = async (currentChanged: Date) => {
+	const update = async (currentChanged: number) => {
+		logger.Clear();
 		logger.Log('Detected changes and working on the runners...');
 		logger.Time('Done', ELogColour.Green);
 		await runnerInstance(toolkitInstance.Runner, Config);
@@ -38,13 +43,13 @@ export const Watcher = () => {
 	};
 
 	const trigger = () => {
-		lastChanged = new Date();
+		lastChanged = new Date().getTime();
 
-		if (!bWorking) {
-			bWorking = true;
-			update(lastChanged)
-				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
-		}
+		if (bWorking) return;
+
+		bWorking = true;
+		update(lastChanged)
+			.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 	};
 
 	const Register = (toolkit: IToolkit, runner: TRunner) => {
@@ -59,8 +64,8 @@ export const Watcher = () => {
 
 				return trigger();
 			})
-			.on('change', () => trigger())
-			.on('unlink', () => trigger())
+			.on('change', () => { if (!bWorking) trigger(); })
+			.on('unlink', () => { if (!bWorking) trigger(); })
 			.on('error', (error) => logger.Log(`Build-Toolkit error: ${error}`, ELogColour.Red));
 	};
 

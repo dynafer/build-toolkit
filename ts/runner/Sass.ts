@@ -10,11 +10,11 @@ import * as Type from '../utils/Type';
 export interface ISassSetting {
 	input: string,
 	output: string,
-	compressed?: boolean
+	compressed?: boolean,
 }
 
 export interface ISassRunner {
-	readonly Run: (setting: ISassSetting | ISassSetting[]) => void;
+	readonly Run: (setting: ISassSetting | ISassSetting[]) => void,
 }
 
 const SassRunner = (): ISassRunner => {
@@ -67,7 +67,7 @@ const SassRunner = (): ISassRunner => {
 
 		return new Promise((resolve) => {
 			if (Type.IsArray(settings)) {
-				const sassList = [];
+				const sassList: Promise<void>[] = [];
 				for (const setting of settings) {
 					if (!Type.IsObject(setting)) {
 						logger.Throw('Setting must be a key-value object');
@@ -80,6 +80,7 @@ const SassRunner = (): ISassRunner => {
 				Promise.all(sassList)
 					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
 					.finally(() => {
+						sassList.splice(0, sassList.length);
 						logger.TimeEnd('All done in', ELogColour.Green);
 						resolve();
 					});
@@ -90,7 +91,7 @@ const SassRunner = (): ISassRunner => {
 				}
 
 				runner(settings)
-					.then(() =>resolve())
+					.then(() => resolve())
 					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 			}
 		});

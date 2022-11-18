@@ -1,4 +1,6 @@
 # @dynafer/build-toolkit
+## Change Logs
+* ### [1.0.2 (18-11-2022)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.2.md)
 ## Installation
 ```bash
 $ npm i --save-dev @dynafer/build-toolkit
@@ -14,7 +16,8 @@ module.exports = async(runner, config) => {
    *     Command,
    *     Rollup,
    *     Sass,
-   *     Task
+   *     Task,
+   *     Icons,
    * }
    * config: {
    *     BasePath,
@@ -146,6 +149,53 @@ module.exports = async(runner, config) => {
 
   // If you don't want to run the task on watching
   await runner.Task.Run(taskRunner, false);
+  ...
+};
+```
+### 5. Icons
+```javascript
+module.exports = async(runner, config) => {
+  ...
+  const iconSetting = {
+    dir: '<svg files directory path>',
+    output: '<output file path>',
+    type: 'json' | 'const' | 'argument',
+    naming: 'const or argument naming',
+  };
+
+  await runner.Icons.Build(iconSetting);
+
+  // JSON type setting
+  // Output would be .json file
+  const jsonSetting = {
+    dir: '<svg files directory path>',
+    output: '<output file path>',
+    type: 'json'
+  };
+
+  await runner.Icons.Build(jsonSetting);
+
+  // Constant type setting
+  // Output would be .js file
+  const constSetting = {
+    dir: '<svg files directory path>',
+    output: '<output file path>',
+    type: 'const'
+    naming: 'icons' // It will be const icons = { ... };
+  };
+
+  await runner.Icons.Build(constSetting);
+
+  // Argument type setting
+  // Output would be .js file
+  const argSetting = {
+    dir: '<svg files directory path>',
+    output: '<output file path>',
+    type: 'argument'
+    naming: 'icons.add' // It will be icons.add({ ... });
+  };
+
+  await runner.Icons.Build(argSetting);
   ...
 };
 ```
