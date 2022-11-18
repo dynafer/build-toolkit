@@ -10,7 +10,7 @@ import { IsString, IsArray, IsObject } from '../utils/Type';
 export interface ICommandSetting {
 	cd?: string,
 	watch?: boolean,
-	command: string
+	command: string,
 }
 
 export interface ICommandRunner {
@@ -21,6 +21,8 @@ const CommandRunner = (): ICommandRunner => {
 	const logger = LoggerConstructor('Command');
 
 	const runner = (setting: ICommandSetting): Promise<void> => {
+		if (System.IsWatching() && System.IsError()) return Promise.resolve();
+
 		if (!IsString(setting.command)) {
 			logger.Throw('Command must be a string.');
 			return Promise.resolve();
@@ -53,6 +55,7 @@ const CommandRunner = (): ICommandRunner => {
 					return resolve();
 				}
 
+				commands.splice(0, commands.length);
 				logger.TimeEnd('Done in', ELogColour.Green);
 				resolve();
 			});
@@ -85,6 +88,7 @@ const CommandRunner = (): ICommandRunner => {
 				Promise.all(execList)
 					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
 					.finally(() => {
+						execList.splice(0, execList.length);
 						logger.TimeEnd('All done in', ELogColour.Green);
 						resolve();
 					});

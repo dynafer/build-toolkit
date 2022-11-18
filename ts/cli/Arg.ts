@@ -42,7 +42,7 @@ const HelpCLI = () => {
 
 	let terminalText = '';
 
-	for (let index = 0; index < options.length; ++ index) {
+	for (let index = 0; index < options.length; ++index) {
 		terminalText += `${options[index]} ${helps[index]}\t\t${descriptions[index]}\n`;
 	}
 
@@ -53,7 +53,7 @@ const ArgConstructor = () => {
 	const args: string[] = [];
 
 	let bNeedPush = false;
-	
+
 	for (const arg of process.argv) {
 		if (arg === '-h' || arg === '--help') {
 			HelpCLI();
@@ -74,7 +74,7 @@ const ArgConstructor = () => {
 
 		let bSkip = false;
 
-		for (let index = 0; index < args.length; ++ index) {
+		for (let index = 0; index < args.length; ++index) {
 			if (bSkip) {
 				bSkip = false;
 				continue;

@@ -11,15 +11,27 @@ export enum ELogColour {
 	Blue = '\x1b[34m%s\x1b[0m',
 	Magenta = '\x1b[35m%s\x1b[0m',
 	Cyan = '\x1b[36m%s\x1b[0m',
-	White = '\x1b[37m%s\x1b[0m'
+	White = '\x1b[37m%s\x1b[0m',
 }
 
-const LoggerConstructor = (name: string = 'Build-Toolkit') => {
+export interface ILoggerConstructor {
+	UseLoggerManually: () => void,
+	Clear: () => void,
+	Color: (text?: string, color?: string) => string,
+	Log: (text?: string, color?: string) => void,
+	Throw: (error?: Error | string, code?: number) => void,
+	Time: (label?: string, color?: string) => void,
+	TimeEnd: (label?: string, color?: string) => void,
+}
+
+const LoggerConstructor = (name: string = 'Build-Toolkit'): ILoggerConstructor => {
 	let bLogger: boolean = System.IsLogging();
 
 	const UseLoggerManually = () => {
 		bLogger = true;
 	};
+
+	const Clear = () => console.clear();
 
 	const Color = (text: string = '', color: string = ELogColour.Default): string => color.replace('%s', `${name}: ${text}`);
 
@@ -53,6 +65,7 @@ const LoggerConstructor = (name: string = 'Build-Toolkit') => {
 
 	return {
 		UseLoggerManually,
+		Clear,
 		Color,
 		Log,
 		Throw,

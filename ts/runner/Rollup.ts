@@ -4,19 +4,19 @@ import { minify } from 'uglify-js';
 import ExitCode from '../utils/ExitCode';
 import { LoggerConstructor, ELogColour } from '../utils/Logger';
 import System from '../utils/System';
-import { IsArray, IsObject, IsString, IsEmpty } from '../utils/Type';
+import * as Type from '../utils/Type';
 
 export interface IOutputOptions extends OutputOptions {
-	createUglified?: boolean
+	createUglified?: boolean,
 }
 
 export interface IRollupOptions extends InputOptions {
-	output?: IOutputOptions | IOutputOptions[];
+	output?: IOutputOptions | IOutputOptions[],
 }
 
 export interface IRollupRunner {
 	readonly Register: (setting: IRollupOptions | IRollupOptions[]) => void,
-	readonly Run: () => Promise<void>
+	readonly Run: () => Promise<void>,
 }
 
 const RollupRunner = (): IRollupRunner => {
@@ -24,7 +24,7 @@ const RollupRunner = (): IRollupRunner => {
 	const logger = LoggerConstructor('Rollup');
 
 	const writeBundle = (outputOption: IOutputOptions, value: RollupOutput) => {
-		if (IsString(outputOption.file) && outputOption.createUglified) {
+		if (Type.IsString(outputOption.file) && outputOption.createUglified) {
 			for (const output of value.output) {
 				if (output.type !== 'chunk') continue;
 				fs.writeFileSync(outputOption.file.replace(/.js$/gi, '.min.js'), minify(output.code).code, 'utf8');
@@ -47,12 +47,14 @@ const RollupRunner = (): IRollupRunner => {
 	};
 
 	const runner = (setting: IRollupOptions): Promise<void> => {
+		if (System.IsWatching() && System.IsError()) return Promise.resolve();
+
 		return new Promise((resolve) => {
 			const outputOptions: IOutputOptions[] = [];
 
 			if (setting.output) {
-				if (IsArray(setting.output)) outputOptions.push(...setting.output);
-				else if (IsObject(setting.output))outputOptions.push(setting.output);
+				if (Type.IsArray(setting.output)) outputOptions.push(...setting.output);
+				else if (Type.IsObject(setting.output)) outputOptions.push(setting.output);
 				else {
 					logger.Throw('Check your rollup output configuration.');
 					return Promise.resolve();
@@ -66,9 +68,9 @@ const RollupRunner = (): IRollupRunner => {
 	};
 
 	const Register = (setting: IRollupOptions | IRollupOptions[]) => {
-		if (IsArray(setting)) {
+		if (Type.IsArray(setting)) {
 			rollupSetting.push(...setting);
-		} else if (IsObject(setting)) {
+		} else if (Type.IsObject(setting)) {
 			rollupSetting.push(setting);
 		} else {
 			return logger.Throw('Check your rollup configuration.');
@@ -77,7 +79,7 @@ const RollupRunner = (): IRollupRunner => {
 
 	const Run = (): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
-		if (IsEmpty(rollupSetting)) {
+		if (Type.IsEmpty(rollupSetting)) {
 			logger.Throw('To run rollup, must register rollup before running.');
 			return Promise.resolve();
 		}
@@ -95,6 +97,8 @@ const RollupRunner = (): IRollupRunner => {
 			Promise.all(rollupList)
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
 				.finally(() => {
+					rollupList.splice(0, rollupList.length);
+					rollupSetting.splice(0, rollupSetting.length);
 					logger.TimeEnd('All done in', ELogColour.Green);
 					resolve();
 				});

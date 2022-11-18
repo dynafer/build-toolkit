@@ -1,5 +1,5 @@
 export interface IPathUtils {
-	WorkDir: string
+	WorkDir: string,
 }
 
 const PathUtils = (): IPathUtils => {
