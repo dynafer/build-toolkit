@@ -61,7 +61,7 @@ const RollupRunner = (): IRollupRunner => {
 				}
 			}
 
-			rollup(setting)
+			return rollup(setting)
 				.then(build => bundling(outputOptions, build, resolve))
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 		});
@@ -94,13 +94,13 @@ const RollupRunner = (): IRollupRunner => {
 				rollupList.push(runner(setting));
 			}
 
-			Promise.all(rollupList)
+			return Promise.all(rollupList)
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
 				.finally(() => {
 					rollupList.splice(0, rollupList.length);
 					rollupSetting.splice(0, rollupSetting.length);
 					logger.TimeEnd('All done in', ELogColour.Green);
-					resolve();
+					return resolve();
 				});
 		});
 	};

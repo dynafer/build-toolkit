@@ -9,7 +9,7 @@ import * as Type from '../utils/Type';
 export interface IIconsSetting {
 	dir: string,
 	output: string,
-	type: 'json' | 'const' | 'argument',
+	type: 'json' | 'const' | 'argument' | 'module',
 	naming?: string,
 }
 
@@ -25,7 +25,7 @@ const Icons = (): IIconsRunner => {
 			fs.writeFile(output, getText(), 'utf8', (error) => {
 				if (error) reject(error);
 
-				resolve();
+				return resolve();
 			});
 		});
 
@@ -37,7 +37,7 @@ const Icons = (): IIconsRunner => {
 		return text;
 	};
 
-	const createGetText = (type: IIconsSetting['type'], naming: string | undefined, map: Record<string, string>) =>
+	const createGetText = (type: Exclude<IIconsSetting['type'], 'module'>, naming: string | undefined, map: Record<string, string>) =>
 		(): string => {
 			switch (type) {
 				case 'json':
@@ -46,6 +46,16 @@ const Icons = (): IIconsRunner => {
 					return `const ${naming} = {\n${mapToString(map)}};`;
 				case 'argument':
 					return `${naming}({\n${mapToString(map)}});`;
+			}
+		};
+
+	const createModuleStrings = (type: 'js' | 'declare', naming: string | undefined, getText: () => string) =>
+		() => {
+			switch (type) {
+				case 'js':
+					return `${getText()}\nexport default ${naming};`;
+				case 'declare':
+					return `declare const ${naming}: Record<string, string>;\nexport default ${naming}`;
 			}
 		};
 
@@ -88,6 +98,18 @@ const Icons = (): IIconsRunner => {
 							return resolve();
 						})
 						.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
+				case 'module':
+					const getText = createGetText('const', setting.naming, svgMap);
+					const saves = [
+						save(`${output}.js`, createModuleStrings('js', setting.naming, getText)),
+						save(`${output}.d.ts`, createModuleStrings('declare', setting.naming, getText)),
+					];
+					return Promise.all(saves)
+						.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
+						.finally(() => {
+							logger.TimeEnd('Done in', ELogColour.Green);
+							return resolve();
+						});
 				default:
 					logger.Throw(`${setting.type} type doesn't exist.`);
 					return resolve();
