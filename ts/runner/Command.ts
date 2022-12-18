@@ -20,7 +20,7 @@ export interface ICommandRunner {
 const CommandRunner = (): ICommandRunner => {
 	const logger = LoggerConstructor('Command');
 
-	const runner = (setting: ICommandSetting): Promise<void> => {
+	const runner = (setting: ICommandSetting, bLogTime: boolean = true): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 
 		if (!IsString(setting.command)) {
@@ -28,7 +28,7 @@ const CommandRunner = (): ICommandRunner => {
 			return Promise.resolve();
 		}
 		logger.Log(`Executing ${setting.command}`);
-		logger.Time('Done in', ELogColour.Green);
+		if (bLogTime) logger.Time('Done in', ELogColour.Green);
 
 		return new Promise((resolve) => {
 			const commands: string[] = [];
@@ -56,8 +56,8 @@ const CommandRunner = (): ICommandRunner => {
 				}
 
 				commands.splice(0, commands.length);
-				logger.TimeEnd('Done in', ELogColour.Green);
-				resolve();
+				if (bLogTime) logger.TimeEnd('Done in', ELogColour.Green);
+				return resolve();
 			});
 		});
 	};
@@ -82,7 +82,7 @@ const CommandRunner = (): ICommandRunner => {
 				const execList: Promise<void>[] = [];
 				for (const setting of settings) {
 					if (System.IsWatching() && !(setting.watch ?? true)) continue;
-					execList.push(runner(setting));
+					execList.push(runner(setting, false));
 				}
 
 				Promise.all(execList)
@@ -90,7 +90,7 @@ const CommandRunner = (): ICommandRunner => {
 					.finally(() => {
 						execList.splice(0, execList.length);
 						logger.TimeEnd('All done in', ELogColour.Green);
-						resolve();
+						return resolve();
 					});
 			} else {
 				runner(settings)

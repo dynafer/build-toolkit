@@ -26,10 +26,10 @@ const TaskRunner = (): ITaskRunner => {
 				return resolve();
 			}
 
-			task()
+			return task()
 				.then(() => {
 					logger.TimeEnd('Done in', ELogColour.Green);
-					resolve();
+					return resolve();
 				})
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 		});

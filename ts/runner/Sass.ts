@@ -39,13 +39,13 @@ const SassRunner = (): ISassRunner => {
 			const sassOption: Options<'async'> = {};
 			if (setting.compressed) sassOption.style = 'compressed';
 
-			sass.compileAsync(fs.existsSync(inputPath) ? inputPath : combinedPath, sassOption)
+			return sass.compileAsync(fs.existsSync(inputPath) ? inputPath : combinedPath, sassOption)
 				.then(value => {
 					fs.writeFile(setting.output, value.css, 'utf8', (error) => {
 						if (error) return logger.Throw(error, ExitCode.FAILURE.UNEXPECTED);
 
 						logger.TimeEnd(`Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green);
-						resolve();
+						return resolve();
 					});
 				})
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
@@ -66,34 +66,34 @@ const SassRunner = (): ISassRunner => {
 		}
 
 		return new Promise((resolve) => {
-			if (Type.IsArray(settings)) {
-				const sassList: Promise<void>[] = [];
-				for (const setting of settings) {
-					if (!Type.IsObject(setting)) {
-						logger.Throw('Setting must be a key-value object');
-						return resolve();
-					}
-
-					sassList.push(runner(setting));
-				}
-
-				Promise.all(sassList)
-					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
-					.finally(() => {
-						sassList.splice(0, sassList.length);
-						logger.TimeEnd('All done in', ELogColour.Green);
-						resolve();
-					});
-			} else {
+			if (!Type.IsArray(settings)) {
 				if (!Type.IsObject(settings)) {
 					logger.Throw('Setting must be a key-value object');
 					return resolve();
 				}
 
-				runner(settings)
+				return runner(settings)
 					.then(() => resolve())
 					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 			}
+
+			const sassList: Promise<void>[] = [];
+			for (const setting of settings) {
+				if (!Type.IsObject(setting)) {
+					logger.Throw('Setting must be a key-value object');
+					return resolve();
+				}
+
+				sassList.push(runner(setting));
+			}
+
+			return Promise.all(sassList)
+				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
+				.finally(() => {
+					sassList.splice(0, sassList.length);
+					logger.TimeEnd('All done in', ELogColour.Green);
+					return resolve();
+				});
 		});
 	};
 
