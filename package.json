@@ -11,7 +11,7 @@
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
-    "@finer-group/eslint-plugin": "^0.0.5",
+    "@finer-group/eslint-plugin": "^0.0.6",
     "@types/node": "^18.11.18",
     "@types/uglify-js": "^3.17.1",
     "eslint": "^8.31.0",

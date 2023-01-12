@@ -73,7 +73,7 @@ const RollupRunner = (): IRollupRunner => {
 		} else if (Type.IsObject(setting)) {
 			rollupSetting.push(setting);
 		} else {
-			return logger.Throw('Check your rollup configuration.');
+			logger.Throw('Check your rollup configuration.');
 		}
 	};
 

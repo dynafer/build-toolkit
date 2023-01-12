@@ -1,4 +1,4 @@
-const ARGS = {
+const ARGS: Record<string, Record<string, string>> = {
 	'-c': {
 		type: 'config',
 		help: '<filename>',
@@ -74,7 +74,7 @@ const ArgConstructor = () => {
 
 		let bSkip = false;
 
-		for (let index = 0; index < args.length; ++index) {
+		for (let index = 0, length = args.length; index < length; ++index) {
 			if (bSkip) {
 				bSkip = false;
 				continue;
@@ -83,9 +83,9 @@ const ArgConstructor = () => {
 			const arg = args[index];
 			const nextArg = args[index + 1] ?? false;
 
-			if (argKeys.includes(arg) && nextArg) {
-				options[ARGS[arg].type] = nextArg;
-			}
+			if (!argKeys.includes(arg) || !nextArg) continue;
+
+			options[ARGS[arg].type] = nextArg;
 		}
 
 		return options;

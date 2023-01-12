@@ -20,7 +20,7 @@ export interface ICommandRunner {
 const CommandRunner = (): ICommandRunner => {
 	const logger = LoggerConstructor('Command');
 
-	const runner = (setting: ICommandSetting, bLogTime: boolean = true): Promise<void> => {
+	const runner = (setting: ICommandSetting, bLogTime: boolean = true, current?: number, total?: number): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 
 		if (!IsString(setting.command)) {
@@ -28,7 +28,7 @@ const CommandRunner = (): ICommandRunner => {
 			return Promise.resolve();
 		}
 		logger.Log(`Executing ${setting.command}`);
-		if (bLogTime) logger.Time('Done in', ELogColour.Green);
+		if (bLogTime) logger.Time('Done in', ELogColour.Green, current, total);
 
 		return new Promise((resolve) => {
 			const commands: string[] = [];
@@ -56,7 +56,7 @@ const CommandRunner = (): ICommandRunner => {
 				}
 
 				commands.splice(0, commands.length);
-				if (bLogTime) logger.TimeEnd('Done in', ELogColour.Green);
+				if (bLogTime) logger.TimeEnd('Done in', ELogColour.Green, current, total);
 				return resolve();
 			});
 		});
@@ -73,30 +73,31 @@ const CommandRunner = (): ICommandRunner => {
 		if (IsArray(settings)) {
 			logger.Log('Executing commands...');
 			logger.Time('All done in', ELogColour.Green);
-		} else {
-			if (System.IsWatching() && !(settings.watch ?? true)) return Promise.resolve();
+		} else if (System.IsWatching() && !(settings.watch ?? true)) {
+			return Promise.resolve();
 		}
 
 		return new Promise((resolve) => {
-			if (IsArray(settings)) {
-				const execList: Promise<void>[] = [];
-				for (const setting of settings) {
-					if (System.IsWatching() && !(setting.watch ?? true)) continue;
-					execList.push(runner(setting, false));
-				}
-
-				Promise.all(execList)
-					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
-					.finally(() => {
-						execList.splice(0, execList.length);
-						logger.TimeEnd('All done in', ELogColour.Green);
-						return resolve();
-					});
-			} else {
-				runner(settings)
+			if (!IsArray(settings)) {
+				return runner(settings)
 					.then(() => resolve())
 					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 			}
+
+			const execList: Promise<void>[] = [];
+			for (let index = 0, length = settings.length; index < length; ++index) {
+				const setting = settings[index];
+				if (System.IsWatching() && !(setting.watch ?? true)) continue;
+				execList.push(runner(setting, false, index + 1, length));
+			}
+
+			Promise.all(execList)
+				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
+				.finally(() => {
+					execList.splice(0, execList.length);
+					logger.TimeEnd('All done in', ELogColour.Green);
+					return resolve();
+				});
 		});
 	};
 

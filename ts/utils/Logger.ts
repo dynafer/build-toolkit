@@ -17,11 +17,11 @@ export enum ELogColour {
 export interface ILoggerConstructor {
 	UseLoggerManually: () => void,
 	Clear: () => void,
-	Color: (text?: string, color?: string) => string,
+	Color: (text?: string, color?: string, current?: number, total?: number) => string,
 	Log: (text?: string, color?: string) => void,
 	Throw: (error?: Error | string, code?: number) => void,
-	Time: (label?: string, color?: string) => void,
-	TimeEnd: (label?: string, color?: string) => void,
+	Time: (label?: string, color?: string, current?: number, total?: number) => void,
+	TimeEnd: (label?: string, color?: string, current?: number, total?: number) => void,
 }
 
 const LoggerConstructor = (name: string = 'Build-Toolkit'): ILoggerConstructor => {
@@ -31,9 +31,18 @@ const LoggerConstructor = (name: string = 'Build-Toolkit'): ILoggerConstructor =
 		bLogger = true;
 	};
 
-	const Clear = () => console.clear();
+	const Clear = () => {
+		const lines = process.stdout.getWindowSize()[1];
+		for (let i = 0; i < lines; i++) {
+			console.log('\r\n');
+		}
+		console.clear();
+	};
 
-	const Color = (text: string = '', color: string = ELogColour.Default): string => color.replace('%s', `${name}: ${text}`);
+	const Color = (text: string = '', color: string = ELogColour.Default, current?: number, total?: number): string => {
+		const steps = current && total ? `[${current}/${total}] ` : '';
+		return color.replace('%s', `${steps}${name}: ${text}`);
+	};
 
 	const Log = (text: string = '', color: string = ELogColour.Default) => {
 		if (!bLogger) return;
@@ -53,14 +62,14 @@ const LoggerConstructor = (name: string = 'Build-Toolkit'): ILoggerConstructor =
 		process.exit(code);
 	};
 
-	const Time = (label: string = '', color: string = ELogColour.Default) => {
+	const Time = (label: string = '', color: string = ELogColour.Default, current?: number, total?: number) => {
 		if (!bLogger) return;
-		console.time(Color(label, color));
+		console.time(Color(label, color, current, total));
 	};
 
-	const TimeEnd = (label: string = '', color: string = ELogColour.Default) => {
+	const TimeEnd = (label: string = '', color: string = ELogColour.Default, current?: number, total?: number) => {
 		if (!bLogger) return;
-		console.timeEnd(Color(label, color));
+		console.timeEnd(Color(label, color, current, total));
 	};
 
 	return {

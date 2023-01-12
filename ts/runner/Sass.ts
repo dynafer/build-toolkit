@@ -20,13 +20,13 @@ export interface ISassRunner {
 const SassRunner = (): ISassRunner => {
 	const logger = LoggerConstructor('SASS');
 
-	const runner = (setting: ISassSetting): Promise<void> => {
+	const runner = (setting: ISassSetting, current?: number, total?: number): Promise<void> => {
 		if (!Type.IsString(setting.input) || !Type.IsString(setting.output)) {
 			logger.Throw('Input and output must be a string');
 			return Promise.resolve();
 		}
 		logger.Log(`Compiling ${setting.input} to ${setting.output}`);
-		logger.Time(`Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green);
+		logger.Time(`Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green, current, total);
 
 		return new Promise((resolve) => {
 			const inputPath = setting.input;
@@ -36,19 +36,16 @@ const SassRunner = (): ISassRunner => {
 				return resolve();
 			}
 
-			const sassOption: Options<'async'> = {};
+			const sassOption: Options<'sync'> = {};
 			if (setting.compressed) sassOption.style = 'compressed';
 
-			return sass.compileAsync(fs.existsSync(inputPath) ? inputPath : combinedPath, sassOption)
-				.then(value => {
-					fs.writeFile(setting.output, value.css, 'utf8', (error) => {
-						if (error) return logger.Throw(error, ExitCode.FAILURE.UNEXPECTED);
+			const compiled = sass.compile(fs.existsSync(inputPath) ? inputPath : combinedPath, sassOption);
+			fs.writeFile(setting.output, compiled.css, 'utf8', (error) => {
+				if (error) return logger.Throw(error, ExitCode.FAILURE.UNEXPECTED);
 
-						logger.TimeEnd(`Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green);
-						return resolve();
-					});
-				})
-				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
+				logger.TimeEnd(`Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green, current, total);
+				return resolve();
+			});
 		});
 	};
 
@@ -78,13 +75,14 @@ const SassRunner = (): ISassRunner => {
 			}
 
 			const sassList: Promise<void>[] = [];
-			for (const setting of settings) {
+			for (let index = 0, length = settings.length; index < length; ++index) {
+				const setting = settings[index];
 				if (!Type.IsObject(setting)) {
 					logger.Throw('Setting must be a key-value object');
 					return resolve();
 				}
 
-				sassList.push(runner(setting));
+				sassList.push(runner(setting, index + 1, length));
 			}
 
 			return Promise.all(sassList)
