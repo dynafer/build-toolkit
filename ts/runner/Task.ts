@@ -1,5 +1,5 @@
 import ExitCode from '../utils/ExitCode';
-import { LoggerConstructor, ELogColour } from '../utils/Logger';
+import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import System from '../utils/System';
 import * as Type from '../utils/Type';
 
@@ -18,7 +18,7 @@ const TaskRunner = (): ITaskRunner => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 		if (System.IsWatching() && !watch) return Promise.resolve();
 		logger.Log('Running a task...');
-		logger.Time('Done in', ELogColour.Green);
+		const timer = logger.Time();
 
 		return new Promise((resolve) => {
 			if (!Type.IsFunction(task)) {
@@ -28,7 +28,7 @@ const TaskRunner = (): ITaskRunner => {
 
 			return task()
 				.then(() => {
-					logger.TimeEnd('Done in', ELogColour.Green);
+					logger.TimeEnd(timer, 'Done in', ELogColour.Green);
 					return resolve();
 				})
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));

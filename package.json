@@ -1,27 +1,28 @@
 {
   "name": "@dynafer/build-toolkit",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "repository": "https://github.com/dynafer/build-toolkit.git",
   "author": "Dynafer",
   "bin": {
     "build-toolkit": "bin/build-toolkit.js"
   },
   "scripts": {
-    "prepublishOnly": "tsc -b",
+    "prepublishOnly": "yarn run lint & yarn run build",
+    "build": "tsc -b",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
-    "@finer-group/eslint-plugin": "^0.0.6",
-    "@types/node": "^18.11.18",
+    "@finer-group/eslint-plugin": "^0.0.7",
+    "@types/node": "^18.14.6",
     "@types/uglify-js": "^3.17.1",
-    "eslint": "^8.31.0",
-    "tslib": "^2.4.1",
-    "typescript": "^4.9.4"
+    "eslint": "^8.35.0",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "chokidar": "^3.5.3",
-    "rollup": "^3.9.1",
-    "sass": "^1.57.1",
+    "rollup": "^3.18.0",
+    "sass": "^1.58.3",
     "uglify-js": "^3.17.4"
   },
   "main": "build/lib/BuildToolkit.js",

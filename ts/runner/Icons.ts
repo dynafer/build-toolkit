@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Config } from '../Configuration';
 import ExitCode from '../utils/ExitCode';
-import { LoggerConstructor, ELogColour } from '../utils/Logger';
+import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import System from '../utils/System';
 import * as Type from '../utils/Type';
 
@@ -62,12 +62,12 @@ const Icons = (): IIconsRunner => {
 	const Build = (setting: IIconsSetting): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 		if (!Type.IsObject(setting)) {
-			logger.Throw('Setting must be an object');
+			logger.Throw('Setting must be an object.');
 			return Promise.resolve();
 		}
 
 		logger.Log('Building icons...');
-		logger.Time('Done in', ELogColour.Green);
+		const timer = logger.Time();
 
 		return new Promise((resolve) => {
 			const dir = path.resolve(Config.BasePath, setting.dir);
@@ -94,7 +94,7 @@ const Icons = (): IIconsRunner => {
 				case 'argument':
 					return save(output, createGetText(setting.type, setting.naming, svgMap))
 						.then(() => {
-							logger.TimeEnd('Done in', ELogColour.Green);
+							logger.TimeEnd(timer, 'Done in', ELogColour.Green);
 							return resolve();
 						})
 						.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
@@ -107,7 +107,7 @@ const Icons = (): IIconsRunner => {
 					return Promise.all(saves)
 						.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
 						.finally(() => {
-							logger.TimeEnd('Done in', ELogColour.Green);
+							logger.TimeEnd(timer, 'Done in', ELogColour.Green);
 							return resolve();
 						});
 				default:
