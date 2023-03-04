@@ -1,4 +1,4 @@
-# Change Log 1.0.4
+# Change Log 1.0.4 (04-03-2023)
 * ### Fixed that watcher didn't build again after finishing it when the files were saved during building.
 * ### Changed console.time and console.timeEnd.
 * ### Updated dependencies version.

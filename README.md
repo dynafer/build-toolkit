@@ -1,7 +1,8 @@
 # @dynafer/build-toolkit
 ## Change Logs
 * ### [1.0.2 (18-11-2022)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.2.md)
-* ### [1.0.3 (12-01-2022)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.3.md)
+* ### [1.0.3 (12-01-2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.3.md)
+* ### [1.0.4 (04-03-2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.4.md)
 ## Installation
 ```bash
 $ npm i --save-dev @dynafer/build-toolkit
