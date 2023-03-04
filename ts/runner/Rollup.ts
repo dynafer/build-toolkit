@@ -2,7 +2,7 @@ import fs from 'fs';
 import { InputOptions, OutputOptions, rollup, RollupBuild, RollupOutput } from 'rollup';
 import { minify } from 'uglify-js';
 import ExitCode from '../utils/ExitCode';
-import { LoggerConstructor, ELogColour } from '../utils/Logger';
+import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import System from '../utils/System';
 import * as Type from '../utils/Type';
 
@@ -85,7 +85,7 @@ const RollupRunner = (): IRollupRunner => {
 		}
 
 		logger.Log('Running rollups...');
-		logger.Time('All done in', ELogColour.Green);
+		const timer = logger.Time();
 
 		return new Promise((resolve) => {
 			const rollupList: Promise<void>[] = [];
@@ -99,7 +99,7 @@ const RollupRunner = (): IRollupRunner => {
 				.finally(() => {
 					rollupList.splice(0, rollupList.length);
 					rollupSetting.splice(0, rollupSetting.length);
-					logger.TimeEnd('All done in', ELogColour.Green);
+					logger.TimeEnd(timer, 'All done in', ELogColour.Green);
 					return resolve();
 				});
 		});

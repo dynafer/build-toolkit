@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+'use strict';
+
 const project = require('../package.json');
 
 console.clear();

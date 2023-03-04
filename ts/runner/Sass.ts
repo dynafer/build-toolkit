@@ -1,9 +1,9 @@
 import fs from 'fs';
-import sass, { Options } from 'sass';
 import path from 'path';
+import sass, { Options } from 'sass';
 import { Config } from '../Configuration';
 import ExitCode from '../utils/ExitCode';
-import { LoggerConstructor, ELogColour } from '../utils/Logger';
+import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import System from '../utils/System';
 import * as Type from '../utils/Type';
 
@@ -22,11 +22,12 @@ const SassRunner = (): ISassRunner => {
 
 	const runner = (setting: ISassSetting, current?: number, total?: number): Promise<void> => {
 		if (!Type.IsString(setting.input) || !Type.IsString(setting.output)) {
-			logger.Throw('Input and output must be a string');
+			logger.Throw('Input and output must be a string.');
 			return Promise.resolve();
 		}
+
 		logger.Log(`Compiling ${setting.input} to ${setting.output}`);
-		logger.Time(`Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green, current, total);
+		const timer = logger.Time();
 
 		return new Promise((resolve) => {
 			const inputPath = setting.input;
@@ -43,7 +44,7 @@ const SassRunner = (): ISassRunner => {
 			fs.writeFile(setting.output, compiled.css, 'utf8', (error) => {
 				if (error) return logger.Throw(error, ExitCode.FAILURE.UNEXPECTED);
 
-				logger.TimeEnd(`Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green, current, total);
+				logger.TimeEnd(timer, `Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green, current, total);
 				return resolve();
 			});
 		});
@@ -53,19 +54,21 @@ const SassRunner = (): ISassRunner => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 
 		if (!Type.IsArray(settings) && !Type.IsObject(settings)) {
-			logger.Throw('Setting must be a key-value object');
+			logger.Throw('Setting must be a key-value object.');
 			return Promise.resolve();
 		}
 
+		let timer = '';
+
 		if (Type.IsArray(settings)) {
 			logger.Log('Compiling all the files...');
-			logger.Time('All done in', ELogColour.Green);
+			timer = logger.Time();
 		}
 
 		return new Promise((resolve) => {
 			if (!Type.IsArray(settings)) {
 				if (!Type.IsObject(settings)) {
-					logger.Throw('Setting must be a key-value object');
+					logger.Throw('Setting must be a key-value object.');
 					return resolve();
 				}
 
@@ -78,7 +81,7 @@ const SassRunner = (): ISassRunner => {
 			for (let index = 0, length = settings.length; index < length; ++index) {
 				const setting = settings[index];
 				if (!Type.IsObject(setting)) {
-					logger.Throw('Setting must be a key-value object');
+					logger.Throw('Setting must be a key-value object.');
 					return resolve();
 				}
 
@@ -89,7 +92,7 @@ const SassRunner = (): ISassRunner => {
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
 				.finally(() => {
 					sassList.splice(0, sassList.length);
-					logger.TimeEnd('All done in', ELogColour.Green);
+					logger.TimeEnd(timer, 'All done in', ELogColour.Green);
 					return resolve();
 				});
 		});

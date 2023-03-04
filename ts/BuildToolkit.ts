@@ -1,5 +1,5 @@
 import Toolkit from './Toolkit';
-import { Watcher } from './watcher/Watcher';
+import { Watcher } from './Watcher';
 
 export {
 	Toolkit,

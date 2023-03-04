@@ -1,49 +1,54 @@
 import { watch } from 'chokidar';
 import fs from 'fs';
 import path from 'path';
-import { IToolkit } from '../Toolkit';
-import { TRunner } from '../BuildToolkitCLI';
-import { Config } from '../Configuration';
-import ExitCode from '../utils/ExitCode';
-import { LoggerConstructor, ELogColour } from '../utils/Logger';
-import System from '../utils/System';
-import * as Type from '../utils/Type';
+import { TRunner } from './BuildToolkitCLI';
+import { Config } from './Configuration';
+import { IToolkit } from './Toolkit';
+import ExitCode from './utils/ExitCode';
+import { ELogColour, LoggerConstructor } from './utils/Logger';
+import System from './utils/System';
+import * as Type from './utils/Type';
 
 export interface IWatcher {
 	Register: (toolkit: IToolkit, runner: TRunner) => void,
 }
 
 export const Watcher = (): IWatcher => {
-	const logger = LoggerConstructor('Watcher');
-	logger.UseLoggerManually();
+	const logger = LoggerConstructor('Watcher', true);
 
 	const watchPath = fs.existsSync(Config.WatchDir) ? Config.WatchDir : path.resolve(Config.BasePath, Config.WatchDir);
-	if (!fs.existsSync(watchPath)) logger.Throw('Directory to watch doesn\'t exist');
-	let lastChanged: number;
+	if (!fs.existsSync(watchPath)) logger.Throw('Directory to watch doesn\'t exist.');
+
+	const MISSAVED_MILLISECONDS = 100;
+
+	let lastChanged: number = new Date().getTime();
 	let bWorking: boolean = false;
 	let toolkitInstance: IToolkit;
 	let runnerInstance: TRunner;
 
-	const logWatching = () => logger.Log('Watching files...', ELogColour.Green);
+	const logWatching = () => logger.Log('Watching files...', ELogColour.Cyan);
+
+	const isChanged = (time: number): boolean => Math.abs(lastChanged - time) > MISSAVED_MILLISECONDS;
 
 	const update = async (currentChanged: number) => {
 		logger.Clear();
 		logger.Log('Detected changes and working on the runners...');
-		logger.Time('Done', ELogColour.Green);
+		const timer = logger.Time();
 		await runnerInstance(toolkitInstance.Runner, Config);
-		logger.TimeEnd('Done', ELogColour.Green);
+		logger.TimeEnd(timer, 'Done in', ELogColour.Green);
 		System.SetError(false);
 
-		if (currentChanged < lastChanged) {
-			await update(lastChanged);
-		} else {
+		if (currentChanged >= lastChanged || !isChanged(currentChanged)) {
 			bWorking = false;
-			logWatching();
+			return logWatching();
 		}
+
+		await update(lastChanged);
 	};
 
 	const trigger = () => {
-		lastChanged = new Date().getTime();
+		const currentTime = new Date().getTime();
+		if (lastChanged <= currentTime) lastChanged = currentTime;
 
 		if (bWorking) return;
 
@@ -53,7 +58,7 @@ export const Watcher = (): IWatcher => {
 	};
 
 	const Register = (toolkit: IToolkit, runner: TRunner) => {
-		if (!Type.IsObject(toolkit) || !Type.IsFunction(runner)) logger.Throw('Runner must be function');
+		if (!Type.IsObject(toolkit) || !Type.IsFunction(runner)) logger.Throw('Runner must be a function.');
 		toolkitInstance = toolkit;
 		runnerInstance = runner;
 
@@ -64,8 +69,8 @@ export const Watcher = (): IWatcher => {
 
 				return trigger();
 			})
-			.on('change', () => { if (!bWorking) trigger(); })
-			.on('unlink', () => { if (!bWorking) trigger(); })
+			.on('change', trigger)
+			.on('unlink', trigger)
 			.on('error', (error) => logger.Log(`Build-Toolkit error: ${error}`, ELogColour.Red));
 	};
 

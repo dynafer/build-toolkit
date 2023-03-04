@@ -3,9 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import { Config } from '../Configuration';
 import ExitCode from '../utils/ExitCode';
-import { LoggerConstructor, ELogColour } from '../utils/Logger';
+import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import System from '../utils/System';
-import { IsString, IsArray, IsObject } from '../utils/Type';
+import { IsArray, IsObject, IsString } from '../utils/Type';
 
 export interface ICommandSetting {
 	cd?: string,
@@ -28,7 +28,8 @@ const CommandRunner = (): ICommandRunner => {
 			return Promise.resolve();
 		}
 		logger.Log(`Executing ${setting.command}`);
-		if (bLogTime) logger.Time('Done in', ELogColour.Green, current, total);
+
+		const timer = !bLogTime ? '' : logger.Time();
 
 		return new Promise((resolve) => {
 			const commands: string[] = [];
@@ -56,7 +57,7 @@ const CommandRunner = (): ICommandRunner => {
 				}
 
 				commands.splice(0, commands.length);
-				if (bLogTime) logger.TimeEnd('Done in', ELogColour.Green, current, total);
+				if (bLogTime) logger.TimeEnd(timer, 'Done in', ELogColour.Green, current, total);
 				return resolve();
 			});
 		});
@@ -66,13 +67,15 @@ const CommandRunner = (): ICommandRunner => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 
 		if (!IsArray(settings) && !IsObject(settings)) {
-			logger.Throw('Check your rollup configuration');
+			logger.Throw('Check your rollup configuration.');
 			return Promise.resolve();
 		}
 
+		let timer = '';
+
 		if (IsArray(settings)) {
 			logger.Log('Executing commands...');
-			logger.Time('All done in', ELogColour.Green);
+			timer = logger.Time();
 		} else if (System.IsWatching() && !(settings.watch ?? true)) {
 			return Promise.resolve();
 		}
@@ -95,7 +98,7 @@ const CommandRunner = (): ICommandRunner => {
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
 				.finally(() => {
 					execList.splice(0, execList.length);
-					logger.TimeEnd('All done in', ELogColour.Green);
+					logger.TimeEnd(timer, 'All done in', ELogColour.Green);
 					return resolve();
 				});
 		});
