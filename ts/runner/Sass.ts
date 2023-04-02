@@ -73,7 +73,7 @@ const SassRunner = (): ISassRunner => {
 				}
 
 				return runner(settings)
-					.then(() => resolve())
+					.then(resolve)
 					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 			}
 
