@@ -31,7 +31,7 @@ const CommandRunner = (): ICommandRunner => {
 
 		const timer = !bLogTime ? '' : logger.Time();
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			const commands: string[] = [];
 			if (setting.cd) {
 				if (!IsString(setting.cd)) {
@@ -80,7 +80,7 @@ const CommandRunner = (): ICommandRunner => {
 			return Promise.resolve();
 		}
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			if (!IsArray(settings)) {
 				return runner(settings)
 					.then(() => resolve())

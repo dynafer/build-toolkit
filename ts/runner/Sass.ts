@@ -29,7 +29,7 @@ const SassRunner = (): ISassRunner => {
 		logger.Log(`Compiling ${setting.input} to ${setting.output}`);
 		const timer = logger.Time();
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			const inputPath = setting.input;
 			const combinedPath = path.resolve(Config.BasePath, setting.input);
 			if (!fs.existsSync(inputPath) && !fs.existsSync(combinedPath)) {
@@ -41,7 +41,7 @@ const SassRunner = (): ISassRunner => {
 			if (setting.compressed) sassOption.style = 'compressed';
 
 			const compiled = sass.compile(fs.existsSync(inputPath) ? inputPath : combinedPath, sassOption);
-			fs.writeFile(setting.output, compiled.css, 'utf8', (error) => {
+			fs.writeFile(setting.output, compiled.css, 'utf8', error => {
 				if (error) return logger.Throw(error, ExitCode.FAILURE.UNEXPECTED);
 
 				logger.TimeEnd(timer, `Compiled ${setting.input} to ${setting.output} in`, ELogColour.Green, current, total);
@@ -65,7 +65,7 @@ const SassRunner = (): ISassRunner => {
 			timer = logger.Time();
 		}
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			if (!Type.IsArray(settings)) {
 				if (!Type.IsObject(settings)) {
 					logger.Throw('Setting must be a key-value object.');

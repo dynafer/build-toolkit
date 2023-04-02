@@ -22,7 +22,7 @@ const Icons = (): IIconsRunner => {
 
 	const save = (output: string, getText: () => string): Promise<void> =>
 		new Promise((resolve, reject) => {
-			fs.writeFile(output, getText(), 'utf8', (error) => {
+			fs.writeFile(output, getText(), 'utf8', error => {
 				if (error) reject(error);
 
 				return resolve();
@@ -31,9 +31,9 @@ const Icons = (): IIconsRunner => {
 
 	const mapToString = (map: Record<string, string>): string => {
 		let text = '';
-		for (const [key, value] of Object.entries(map)) {
+		Object.entries(map).forEach(([key, value]) => {
 			text += `\t'${key}': '${value.replace(/'/gi, '"')}',\n`;
-		}
+		});
 		return text;
 	};
 
@@ -69,7 +69,7 @@ const Icons = (): IIconsRunner => {
 		logger.Log('Building icons...');
 		const timer = logger.Time();
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			const dir = path.resolve(Config.BasePath, setting.dir);
 			const combinedDir = path.resolve(Config.BasePath, dir);
 			if (!fs.existsSync(dir) && !fs.existsSync(combinedDir)) {
@@ -83,10 +83,10 @@ const Icons = (): IIconsRunner => {
 			const svgs = fs.readdirSync(realPath);
 
 			const svgMap: Record<string, string> = {};
-			for (const svg of svgs) {
-				if (!svg.includes('.svg')) continue;
+			svgs.forEach(svg => {
+				if (!svg.includes('.svg')) return;
 				svgMap[svg.replace('.svg', '')] = fs.readFileSync(path.resolve(realPath, svg), 'utf8');
-			}
+			});
 
 			switch (setting.type) {
 				case 'json':

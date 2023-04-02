@@ -24,27 +24,26 @@ const RollupRunner = (): IRollupRunner => {
 	const logger = LoggerConstructor('Rollup');
 
 	const writeBundle = (outputOption: IOutputOptions, value: RollupOutput) => {
-		if (Type.IsString(outputOption.file) && outputOption.createUglified) {
-			for (const output of value.output) {
-				if (output.type !== 'chunk') continue;
-				fs.writeFileSync(outputOption.file.replace(/.js$/gi, '.min.js'), minify(output.code).code, 'utf8');
-			}
+		if (!Type.IsString(outputOption.file) || !outputOption.createUglified) return;
+		for (let index = 0, length = value.output.length; index < length; ++index) {
+			const output = value.output[index];
+			if (output.type !== 'chunk') continue;
+			fs.writeFileSync(outputOption.file.replace(/.js$/gi, '.min.js'), minify(output.code).code, 'utf8');
 		}
 	};
 
-	const bundling = (outputOptions: IOutputOptions[], build: RollupBuild, callback: () => void) => {
-		for (const outputOption of outputOptions) {
+	const bundling = (outputOptions: IOutputOptions[], build: RollupBuild, callback: () => void) =>
+		outputOptions.forEach(outputOption => {
 			const convertedOption = { ...outputOption };
 			delete convertedOption.createUglified;
 
 			build.write(convertedOption)
-				.then((value) => {
+				.then(value => {
 					writeBundle(outputOption, value);
 					callback();
 				})
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
-		}
-	};
+		});
 
 	const runner = (setting: IRollupOptions): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
@@ -87,12 +86,10 @@ const RollupRunner = (): IRollupRunner => {
 		logger.Log('Running rollups...');
 		const timer = logger.Time();
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			const rollupList: Promise<void>[] = [];
 
-			for (const setting of rollupSetting) {
-				rollupList.push(runner(setting));
-			}
+			rollupSetting.forEach(setting => rollupList.push(runner(setting)));
 
 			return Promise.all(rollupList)
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
