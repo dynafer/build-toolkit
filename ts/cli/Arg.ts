@@ -27,18 +27,18 @@ const HelpCLI = () => {
 	const helps: string[] = [];
 	const descriptions: string[] = [];
 
-	for (const [option, value] of Object.entries(ARGS)) {
+	Object.entries(ARGS).forEach(([option, value]) => {
 		if (types.includes(value.type)) {
 			const index = types.indexOf(value.type);
 			options[index] = `${options[index]}, ${option}`;
-			continue;
+			return;
 		}
 
 		options.push(option);
 		types.push(value.type);
 		helps.push(value.help);
 		descriptions.push(value.description);
-	}
+	});
 
 	let terminalText = '';
 
@@ -54,19 +54,19 @@ const ArgConstructor = () => {
 
 	let bNeedPush = false;
 
-	for (const arg of process.argv) {
+	process.argv.forEach(arg => {
 		if (arg === '-h' || arg === '--help') {
 			HelpCLI();
-			process.exit();
+			return process.exit();
 		}
 
 		if (!bNeedPush && arg.includes('build-toolkit.js')) {
 			bNeedPush = true;
-			continue;
+			return;
 		}
 
 		if (bNeedPush) args.push(arg);
-	}
+	});
 
 	const GetOptions = (): Record<string, string> => {
 		const options: Record<string, string> = {};

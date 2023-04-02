@@ -20,7 +20,7 @@ const TaskRunner = (): ITaskRunner => {
 		logger.Log('Running a task...');
 		const timer = logger.Time();
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			if (!Type.IsFunction(task)) {
 				logger.Throw('Must be an asynchronous function.');
 				return resolve();
