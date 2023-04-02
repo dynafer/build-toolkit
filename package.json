@@ -8,11 +8,14 @@
   },
   "scripts": {
     "prepublishOnly": "yarn run lint & yarn run build",
-    "build": "tsc -b",
+    "build:commonjs": "tsc -p ./tsconfig.commonjs.json",
+    "build:module": "tsc -p ./tsconfig.module.json",
+    "build:types": "tsc -p ./tsconfig.types.json --emitDeclarationOnly",
+    "build": "yarn run build:commonjs && yarn run build:module && yarn run build:types",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
-    "@finer-group/eslint-plugin": "^0.0.7",
+    "@finer-group/eslint-plugin": "^0.0.8",
     "@types/node": "^18.15.11",
     "@types/uglify-js": "^3.17.1",
     "eslint": "^8.37.0",
@@ -26,8 +29,12 @@
     "uglify-js": "^3.17.4"
   },
   "main": "build/lib/BuildToolkit.js",
-  "module": "build/lib/BuildToolkit.js",
-  "types": "build/lib/BuildToolkit.d.ts",
+  "module": "build/lib/module/BuildToolkit.js",
+  "types": "build/lib/module/BuildToolkit.d.ts",
+  "exports": {
+    "import": "./build/lib/module/BuildToolkit.js",
+    "require": "./build/lib/BuildToolkit.js"
+  },
   "publishConfig": {
     "access": "public"
   },

@@ -32,7 +32,7 @@ const RollupRunner = (): IRollupRunner => {
 		}
 	};
 
-	const bundling = (outputOptions: IOutputOptions[], build: RollupBuild, callback: () => void) =>
+	const bundle = (outputOptions: IOutputOptions[], build: RollupBuild, callback: () => void) =>
 		outputOptions.forEach(outputOption => {
 			const convertedOption = { ...outputOption };
 			delete convertedOption.createUglified;
@@ -61,7 +61,7 @@ const RollupRunner = (): IRollupRunner => {
 			}
 
 			return rollup(setting)
-				.then(build => bundling(outputOptions, build, resolve))
+				.then(build => bundle(outputOptions, build, resolve))
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 		});
 	};

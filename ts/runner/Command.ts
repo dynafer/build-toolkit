@@ -83,7 +83,7 @@ const CommandRunner = (): ICommandRunner => {
 		return new Promise(resolve => {
 			if (!IsArray(settings)) {
 				return runner(settings)
-					.then(() => resolve())
+					.then(resolve)
 					.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 			}
 

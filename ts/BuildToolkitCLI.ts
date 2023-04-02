@@ -7,6 +7,7 @@ import { IToolkitConfiguration } from './Configuration';
 import { IToolkitRunner } from './Toolkit';
 import ExitCode from './utils/ExitCode';
 import { LoggerConstructor } from './utils/Logger';
+import PathUtils from './utils/PathUtils';
 import System from './utils/System';
 import * as Type from './utils/Type';
 
@@ -15,13 +16,13 @@ export type TRunner = (runner: IToolkitRunner, config: IToolkitConfiguration) =>
 export const BuildToolkitCLI = () => {
 	const logger = LoggerConstructor();
 	const options = Arg.GetOptions();
-	const workDir = process.cwd();
 
 	System.SetWatching(Type.IsString(options.watch) && !Type.IsEmpty(options.watch));
 	System.SetLogging(!System.IsWatching());
 
-	if (!options.config) options.config = path.resolve(workDir, 'build.config.js');
+	if (!options.config) options.config = 'build.config.js';
 	if (!fs.existsSync(options.config)) return logger.Throw('Configuration file doesn\'t exist.');
+	options.config = path.resolve(PathUtils.WorkDir, options.config);
 
 	import(`${options.config}`)
 		.then(runner => {
