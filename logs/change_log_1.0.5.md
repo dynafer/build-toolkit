@@ -1,4 +1,4 @@
-# Change Log 1.0.5
+# Change Log 1.0.5 (03-04-2023)
 * ### Upgraded dependencies version.
 * ### Changed for ... of ... loops to Array.forEach or for indexing loop.
 * ### Built ES module and types separately.
