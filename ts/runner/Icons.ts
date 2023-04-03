@@ -101,7 +101,7 @@ const Icons = (): IIconsRunner => {
 			return Promise.resolve();
 		}
 
-		if (['const', 'argument', 'module'].includes(setting.type) && (!Type.IsString(setting.naming) || !Type.IsEmpty(setting.naming))) {
+		if (['const', 'argument', 'module'].includes(setting.type) && (!Type.IsString(setting.naming) || Type.IsEmpty(setting.naming))) {
 			logger.Throw(`${setting.type} requires naming.`);
 			return Promise.resolve();
 		}
