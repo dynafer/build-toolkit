@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import Arg from './cli/Arg';
 import { Run } from './cli/Run';
 import { Watch } from './cli/Watch';
@@ -22,7 +21,7 @@ export const BuildToolkitCLI = () => {
 
 	if (!options.config) options.config = 'build.config.js';
 	if (!fs.existsSync(options.config)) return logger.Throw('Configuration file doesn\'t exist.');
-	options.config = path.resolve(PathUtils.WorkDir, options.config);
+	options.config = PathUtils.GetAbsolute(options.config);
 
 	import(`${options.config}`)
 		.then(runner => {

@@ -23,7 +23,7 @@ const RollupRunner = (): IRollupRunner => {
 	const rollupSetting: IRollupOptions[] = [];
 	const logger = LoggerConstructor('Rollup');
 
-	const writeBundle = (outputOption: IOutputOptions, value: RollupOutput) => {
+	const minifyBundle = (outputOption: IOutputOptions, value: RollupOutput) => {
 		if (!Type.IsString(outputOption.file) || !outputOption.createUglified) return;
 		for (let index = 0, length = value.output.length; index < length; ++index) {
 			const output = value.output[index];
@@ -39,7 +39,7 @@ const RollupRunner = (): IRollupRunner => {
 
 			build.write(convertedOption)
 				.then(value => {
-					writeBundle(outputOption, value);
+					minifyBundle(outputOption, value);
 					callback();
 				})
 				.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
@@ -48,7 +48,7 @@ const RollupRunner = (): IRollupRunner => {
 	const runner = (setting: IRollupOptions): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			const outputOptions: IOutputOptions[] = [];
 
 			if (setting.output) {
@@ -67,13 +67,9 @@ const RollupRunner = (): IRollupRunner => {
 	};
 
 	const Register = (setting: IRollupOptions | IRollupOptions[]) => {
-		if (Type.IsArray(setting)) {
-			rollupSetting.push(...setting);
-		} else if (Type.IsObject(setting)) {
-			rollupSetting.push(setting);
-		} else {
-			logger.Throw('Check your rollup configuration.');
-		}
+		if (Type.IsArray(setting)) return rollupSetting.push(...setting);
+		if (Type.IsObject(setting)) return rollupSetting.push(setting);
+		logger.Throw('Check your rollup configuration.');
 	};
 
 	const Run = (): Promise<void> => {

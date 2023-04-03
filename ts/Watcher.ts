@@ -66,8 +66,7 @@ export const Watcher = (): IWatcher => {
 			.on('ready', () => logWatching())
 			.on('add', (filePath, stats) => {
 				if (stats?.size === 0) return;
-
-				return trigger();
+				trigger();
 			})
 			.on('change', trigger)
 			.on('unlink', trigger)
