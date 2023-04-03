@@ -1,8 +1,8 @@
 # @dynafer/build-toolkit
 ## Change Logs
-* ### [1.0.2 (18-11-2022)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.2.md)
 * ### [1.0.3 (12-01-2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.3.md)
 * ### [1.0.4 (04-03-2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.4.md)
+* ### [1.0.5 (04-03-2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.5.md)
 ## Installation
 ```bash
 $ npm i --save-dev @dynafer/build-toolkit
@@ -56,31 +56,36 @@ $ yarn run build-toolkit -w <directory>
 ## Runners
 ### 1. Command
 ```javascript
-module.exports = async(runner, config) => {
+module.exports = async (runner, config) => {
   ...
-  // Run setting must include 'command'
-  await runner.Command.Run({
-    command: 'yarn run eslint'
-  });
+	/**
+	 * Command Setting
+	 *    cd: Optional<directory path>
+	 *    command: <command>
+	 *    watch: Optional<boolean>, Default<true>
+	 */
 
-  // If you want to move to working directory
   await runner.Command.Run({
-    cd: '<directory path>'
-    command: '<command>'
-  });
-
-  // If you don't want to run the command on watching
-  await runner.Command.Run({
-    watch: false,
-    command: '<command>'
+    cd: '<directory path>',
+    command: 'yarn run eslint',
+    watch: false
   });
   ...
 };
 ```
-### 2. Rollup (Using **Rollup.js** module)
+### 2. Rollup (Using **Rollup.js** dependency)
 ```javascript
-module.exports = async(runner, config) => {
+module.exports = async (runner, config) => {
   ...
+	/**
+	 * Rollup Setting
+	 *    Rollup.js Configuration
+     *    output: {
+     *      Rollup.js Output Configuration
+     *      createUglified: Optional<boolean>, Default<false>
+     *    }
+	 */
+
   const singleConfig = {
     // Rollup.js Configuration
   };
@@ -110,26 +115,31 @@ module.exports = async(runner, config) => {
   ...
 };
 ```
-### 3. Sass (Using **sass** module)
+### 3. SASS (Using **sass** dependency)
 ```javascript
-module.exports = async(runner, config) => {
+module.exports = async (runner, config) => {
   ...
+	/**
+	 * SASS Setting
+     *    input: <sass file path>
+     *    output: <output file path>
+     *    compressed: Optional<boolean>, Default<false>
+	 */
+
   const singleConfig = {
-    input: '<scss file path>',
-    output: '<output file path>',
-    compressed: false
+    input: '<sass file path>',
+    output: '<output file path>'
   };
 
   const multipleConfigs = [
     {
-      input: '<scss file path>',
+      input: '<sass file path>',
       output: '<output file path>',
       compressed: true
     },
     {
-      input: '<scss file path>',
-      output: '<output file path>',
-      compressed: false
+      input: '<sass file path>',
+      output: '<output file path>'
     },
     ...
   ];
@@ -141,9 +151,9 @@ module.exports = async(runner, config) => {
 ```
 ### 4. Task
 ```javascript
-module.exports = async(runner, config) => {
+module.exports = async (runner, config) => {
   ...
-  const taskRunner = async(config) => {
+  const taskRunner = async (config) => {
     // any task...
   };
 
@@ -154,15 +164,33 @@ module.exports = async(runner, config) => {
   ...
 };
 ```
+	dir: string,
+	output: string,
+	type: 'json' | 'const' | 'argument' | 'module',
+	naming?: string,
+	uglified?: boolean,
+}
 ### 5. Icons
 ```javascript
-module.exports = async(runner, config) => {
+module.exports = async (runner, config) => {
   ...
+	/**
+	 * Icons Setting
+     *    dir: <svg files directory path>
+     *    output: <output file path>
+     *    type: 'json' | 'const' | 'argument' | 'module'
+     *    naming:
+     *      If type is 'json', empty.
+     *      If type is not 'json', required.
+     *    uglified: Optional<boolean>, Default<false>
+	 */
+
   const iconSetting = {
     dir: '<svg files directory path>',
     output: '<output file path>',
-    type: 'json' | 'const' | 'argument',
-    naming: 'const or argument naming',
+    type: 'json' | 'const' | 'argument' | 'module',
+    naming: 'constant, function, or module name',
+    uglified: true,
   };
 
   await runner.Icons.Build(iconSetting);
@@ -183,8 +211,9 @@ module.exports = async(runner, config) => {
     dir: '<svg files directory path>',
     output: '<output file path>',
     type: 'const'
-    naming: 'icons' // It will be const icons = { ... };
+    naming: 'icons'
   };
+  // Expected: const icons = { ... };
 
   await runner.Icons.Build(constSetting);
 
@@ -194,10 +223,28 @@ module.exports = async(runner, config) => {
     dir: '<svg files directory path>',
     output: '<output file path>',
     type: 'argument'
-    naming: 'icons.add' // It will be icons.add({ ... });
+    naming: 'icons.add'
   };
+  // Expected: icons.add({ ... });
 
   await runner.Icons.Build(argSetting);
+
+  // Module type setting
+  // Output would be .js and .d.ts files
+  const moduleSetting = {
+    dir: '<svg files directory path>',
+    output: '<output file path>',
+    type: 'module'
+    naming: 'icons'
+  };
+	/**
+	 * Expected
+     *    .js: const icons = { ... }; export default icons;
+     *    .d.ts: declare const icons: Record<string, string>;
+     *           export default icons;
+	 */
+
+  await runner.Icons.Build(moduleSetting);
   ...
 };
 ```

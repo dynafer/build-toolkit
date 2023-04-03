@@ -1,68 +1,101 @@
 import fs from 'fs';
 import path from 'path';
+import { minify } from 'uglify-js';
 import { Config } from '../Configuration';
 import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
+import PathUtils from '../utils/PathUtils';
 import System from '../utils/System';
 import * as Type from '../utils/Type';
 
-export interface IIconsSetting {
+export type TIconSetting = IJsonSetting | IOtherSettings;
+
+interface IIconSetting {
 	dir: string,
 	output: string,
-	type: 'json' | 'const' | 'argument' | 'module',
+	uglified?: boolean,
+}
+
+interface IJsonSetting extends IIconSetting {
+	type: 'json',
 	naming?: string,
 }
 
+interface IOtherSettings extends IIconSetting {
+	type: 'const' | 'argument' | 'module',
+	naming: string,
+}
+
 export interface IIconsRunner {
-	Build: (setting: IIconsSetting) => Promise<void>,
+	Build: (setting: TIconSetting) => Promise<void>,
 }
 
 const Icons = (): IIconsRunner => {
 	const logger = LoggerConstructor('Icons');
 
-	const save = (output: string, getText: () => string): Promise<void> =>
-		new Promise((resolve, reject) => {
-			fs.writeFile(output, getText(), 'utf8', error => {
-				if (error) reject(error);
-
+	const save = (output: string, bUglify: boolean, getText: () => string): Promise<void> =>
+		new Promise(resolve =>
+			fs.writeFile(output, bUglify ? minify(getText()).code : getText(), 'utf8', error => {
+				if (error) return logger.Throw(error);
 				return resolve();
-			});
-		});
+			})
+		);
 
-	const mapToString = (map: Record<string, string>): string => {
-		let text = '';
-		Object.entries(map).forEach(([key, value]) => {
-			text += `\t'${key}': '${value.replace(/'/gi, '"')}',\n`;
-		});
+	const combineStringSafely = (chunks: string[]): string => {
+		const text = chunks.join('');
+		chunks.splice(0, chunks.length);
 		return text;
 	};
 
-	const createGetText = (type: Exclude<IIconsSetting['type'], 'module'>, naming: string | undefined, map: Record<string, string>) =>
+	const mapToString = (map: Record<string, string>): string => {
+		const chunks: string[] = [];
+		Object.entries(map).forEach(([key, value]) => {
+			chunks.push('\t', key, ': \'', value.replace(/'/gi, '\''), '\',', '\n');
+		});
+		return combineStringSafely(chunks);
+	};
+
+	const createGetText = (opts: TIconSetting, map: Record<string, string>) =>
 		(): string => {
+			const { type, naming } = opts;
+			const chunks: string[] = [];
+
 			switch (type) {
 				case 'json':
 					return JSON.stringify(map);
 				case 'const':
-					return `const ${naming} = {\n${mapToString(map)}};`;
+				case 'module':
+					chunks.push('const ', naming, ' = ', '{\n', mapToString(map), '};');
+					return combineStringSafely(chunks);
 				case 'argument':
-					return `${naming}({\n${mapToString(map)}});`;
+					chunks.push(naming, '({\n', mapToString(map), '});');
+					return combineStringSafely(chunks);
 			}
 		};
 
-	const createModuleStrings = (type: 'js' | 'declare', naming: string | undefined, getText: () => string) =>
+	const createModuleStrings = (type: 'js' | 'declare', naming: IOtherSettings['naming'], getText: () => string) =>
 		() => {
+			const chunks: string[] = [];
+
 			switch (type) {
 				case 'js':
-					return `${getText()}\nexport default ${naming};`;
+					chunks.push(getText(), '\nexport default ', naming, ';');
+					return combineStringSafely(chunks);
 				case 'declare':
-					return `declare const ${naming}: Record<string, string>;\nexport default ${naming}`;
+					chunks.push('declare const ', naming, ': Record<string, string>;\nexport default ', naming, ';');
+					return combineStringSafely(chunks);
 			}
 		};
 
-	const Build = (setting: IIconsSetting): Promise<void> => {
+	const Build = (setting: TIconSetting): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 		if (!Type.IsObject(setting)) {
 			logger.Throw('Setting must be an object.');
+			return Promise.resolve();
+		}
+
+		if (['const', 'argument', 'module'].includes(setting.type) && (!Type.IsString(setting.naming) || !Type.IsEmpty(setting.naming))) {
+			logger.Throw(`${setting.type} requires naming.`);
 			return Promise.resolve();
 		}
 
@@ -70,39 +103,39 @@ const Icons = (): IIconsRunner => {
 		const timer = logger.Time();
 
 		return new Promise(resolve => {
-			const dir = path.resolve(Config.BasePath, setting.dir);
-			const combinedDir = path.resolve(Config.BasePath, dir);
-			if (!fs.existsSync(dir) && !fs.existsSync(combinedDir)) {
+			const dir = PathUtils.GetAbsolute(setting.dir, Config.BasePath);
+			if (!fs.existsSync(dir)) {
 				logger.Throw(`${dir} doesn't exist.`);
 				return resolve();
 			}
 
-			const output = setting.output;
+			const output = PathUtils.GetAbsolute(setting.output, Config.BasePath);
 
-			const realPath = fs.existsSync(dir) ? dir : combinedDir;
-			const svgs = fs.readdirSync(realPath);
+			const bUglify = setting.uglified ?? false;
+
+			const svgs = fs.readdirSync(dir);
 
 			const svgMap: Record<string, string> = {};
 			svgs.forEach(svg => {
 				if (!svg.includes('.svg')) return;
-				svgMap[svg.replace('.svg', '')] = fs.readFileSync(path.resolve(realPath, svg), 'utf8');
+				svgMap[svg.replace('.svg', '')] = fs.readFileSync(path.resolve(dir, svg), 'utf8');
 			});
 
 			switch (setting.type) {
 				case 'json':
 				case 'const':
 				case 'argument':
-					return save(output, createGetText(setting.type, setting.naming, svgMap))
+					return save(output, bUglify, createGetText(setting, svgMap))
 						.then(() => {
 							logger.TimeEnd(timer, 'Done in', ELogColour.Green);
 							return resolve();
 						})
 						.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 				case 'module':
-					const getText = createGetText('const', setting.naming, svgMap);
+					const getText = createGetText(setting, svgMap);
 					const saves = [
-						save(`${output}.js`, createModuleStrings('js', setting.naming, getText)),
-						save(`${output}.d.ts`, createModuleStrings('declare', setting.naming, getText)),
+						save(`${output}.js`, bUglify, createModuleStrings('js', setting.naming, getText)),
+						save(`${output}.d.ts`, bUglify, createModuleStrings('declare', setting.naming, getText)),
 					];
 					return Promise.all(saves)
 						.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED))
@@ -111,7 +144,7 @@ const Icons = (): IIconsRunner => {
 							return resolve();
 						});
 				default:
-					logger.Throw(`${setting.type} type doesn't exist.`);
+					logger.Throw(`${(setting as Record<string, string>).type} type doesn't exist.`);
 					return resolve();
 			}
 		});

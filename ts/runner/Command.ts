@@ -1,9 +1,9 @@
 import { exec } from 'child_process';
 import fs from 'fs';
-import path from 'path';
 import { Config } from '../Configuration';
 import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
+import PathUtils from '../utils/PathUtils';
 import System from '../utils/System';
 import { IsArray, IsObject, IsString } from '../utils/Type';
 
@@ -35,17 +35,16 @@ const CommandRunner = (): ICommandRunner => {
 			const commands: string[] = [];
 			if (setting.cd) {
 				if (!IsString(setting.cd)) {
-					logger.Throw('Cd must be a string.');
+					logger.Throw('Setting.cd must be a string.');
 					return resolve();
 				}
-				const workDir = setting.cd;
-				const combinedPath = path.resolve(Config.BasePath, workDir);
-				if (!fs.existsSync(workDir) && !fs.existsSync(combinedPath)) {
-					logger.Throw(`${workDir} doesn't exist.`);
+				const workDir = PathUtils.GetAbsolute(setting.cd, Config.BasePath);
+				if (!fs.existsSync(workDir)) {
+					logger.Throw(`${setting.cd} doesn't exist.`);
 					return resolve();
 				}
 
-				commands.push(`cd ${fs.existsSync(workDir) ? workDir : combinedPath}`);
+				commands.push(`cd ${workDir}`);
 			}
 
 			commands.push(setting.command);

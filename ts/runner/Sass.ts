@@ -1,9 +1,9 @@
 import fs from 'fs';
-import path from 'path';
 import sass, { Options } from 'sass';
 import { Config } from '../Configuration';
 import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
+import PathUtils from '../utils/PathUtils';
 import System from '../utils/System';
 import * as Type from '../utils/Type';
 
@@ -30,9 +30,8 @@ const SassRunner = (): ISassRunner => {
 		const timer = logger.Time();
 
 		return new Promise(resolve => {
-			const inputPath = setting.input;
-			const combinedPath = path.resolve(Config.BasePath, setting.input);
-			if (!fs.existsSync(inputPath) && !fs.existsSync(combinedPath)) {
+			const inputPath = PathUtils.GetAbsolute(setting.input, Config.BasePath);
+			if (!fs.existsSync(inputPath)) {
 				logger.Throw(`${inputPath} doesn't exist.`);
 				return resolve();
 			}
@@ -40,7 +39,7 @@ const SassRunner = (): ISassRunner => {
 			const sassOption: Options<'sync'> = {};
 			if (setting.compressed) sassOption.style = 'compressed';
 
-			const compiled = sass.compile(fs.existsSync(inputPath) ? inputPath : combinedPath, sassOption);
+			const compiled = sass.compile(inputPath, sassOption);
 			fs.writeFile(setting.output, compiled.css, 'utf8', error => {
 				if (error) return logger.Throw(error, ExitCode.FAILURE.UNEXPECTED);
 
