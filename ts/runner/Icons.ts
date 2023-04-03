@@ -55,37 +55,44 @@ const Icons = (): IIconsRunner => {
 		return combineStringSafely(chunks);
 	};
 
-	const createGetText = (opts: TIconSetting, map: Record<string, string>) =>
-		(): string => {
-			const { type, naming } = opts;
-			const chunks: string[] = [];
+	const createGetText = (opts: TIconSetting, map: Record<string, string>) => {
+		const { type, naming } = opts;
+		const chunks: string[] = [];
+		let text = '';
 
-			switch (type) {
-				case 'json':
-					return JSON.stringify(map);
-				case 'const':
-				case 'module':
-					chunks.push('const ', naming, ' = ', '{\n', mapToString(map), '};');
-					return combineStringSafely(chunks);
-				case 'argument':
-					chunks.push(naming, '({\n', mapToString(map), '});');
-					return combineStringSafely(chunks);
-			}
-		};
+		switch (type) {
+			case 'json':
+				text = JSON.stringify(map);
+				break;
+			case 'const':
+			case 'module':
+				chunks.push('const ', naming, ' = ', '{\n', mapToString(map), '};');
+				text = combineStringSafely(chunks);
+				break;
+			case 'argument':
+				chunks.push(naming, '({\n', mapToString(map), '});');
+				text = combineStringSafely(chunks);
+				break;
+		}
 
-	const createModuleStrings = (type: 'js' | 'declare', naming: IOtherSettings['naming'], getText: () => string) =>
-		() => {
-			const chunks: string[] = [];
+		return () => text;
+	};
 
-			switch (type) {
-				case 'js':
-					chunks.push(getText(), '\nexport default ', naming, ';');
-					return combineStringSafely(chunks);
-				case 'declare':
-					chunks.push('declare const ', naming, ': Record<string, string>;\nexport default ', naming, ';');
-					return combineStringSafely(chunks);
-			}
-		};
+	const createModuleStrings = (type: 'js' | 'declare', naming: IOtherSettings['naming'], getText: () => string) => {
+		const chunks: string[] = [];
+
+		switch (type) {
+			case 'js':
+				chunks.push(getText(), '\nexport default ', naming, ';');
+				break;
+			case 'declare':
+				chunks.push('declare const ', naming, ': Record<string, string>;\nexport default ', naming, ';');
+				break;
+		}
+
+		const text = combineStringSafely(chunks);
+		return () => text;
+	};
 
 	const Build = (setting: TIconSetting): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
