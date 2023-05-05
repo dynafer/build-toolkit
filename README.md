@@ -1,8 +1,8 @@
 # @dynafer/build-toolkit
 ## Change Logs
-* ### [1.0.3 (12-01-2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.3.md)
 * ### [1.0.4 (04-03-2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.4.md)
 * ### [1.0.5 (03-04-2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.5.md)
+* ### [1.0.6 (--2023)](https://github.com/dynafer/build-toolkit/blob/main/logs/change_log_1.0.6.md)
 ## Installation
 ```bash
 $ npm i --save-dev @dynafer/build-toolkit
@@ -16,10 +16,11 @@ module.exports = async(runner, config) => {
   /**
    * runner: {
    *     Command,
+   *     Icons,
    *     Rollup,
    *     Sass,
    *     Task,
-   *     Icons,
+   *     Test,
    * }
    * config: {
    *     BasePath,
@@ -63,6 +64,7 @@ module.exports = async (runner, config) => {
 	 *    cd: Optional<directory path>
 	 *    command: <command>
 	 *    watch: Optional<boolean>, Default<true>
+	 *        watch option is set to run the command if in watching files.
 	 */
 
   await runner.Command.Run({
@@ -164,12 +166,7 @@ module.exports = async (runner, config) => {
   ...
 };
 ```
-	dir: string,
-	output: string,
-	type: 'json' | 'const' | 'argument' | 'module',
-	naming?: string,
-	uglified?: boolean,
-}
+
 ### 5. Icons
 ```javascript
 module.exports = async (runner, config) => {
@@ -245,6 +242,27 @@ module.exports = async (runner, config) => {
 	 */
 
   await runner.Icons.Build(moduleSetting);
+  ...
+};
+```
+
+### 6. Test
+```javascript
+module.exports = async (runner, config) => {
+  ...
+	/**
+	 * Test Setting
+     *    Jest Configuration
+     *    watch: Optional<boolean>, Default<true>
+     *        watch option is set to run the command if in watching files.
+	 */
+
+  const testSetting = {
+    preset: 'ts-jest',
+    testEnvironment: 'jest-environment-jsdom',
+  };
+
+  await runner.Test.Run(testSetting);
   ...
 };
 ```

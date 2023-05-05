@@ -2,3 +2,4 @@
 ts
 tsconfig.json
 logs
+build.js

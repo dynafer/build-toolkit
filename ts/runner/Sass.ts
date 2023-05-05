@@ -14,7 +14,7 @@ export interface ISassSetting {
 }
 
 export interface ISassRunner {
-	readonly Run: (setting: ISassSetting | ISassSetting[]) => void,
+	Run: (setting: ISassSetting | ISassSetting[]) => void,
 }
 
 const SassRunner = (): ISassRunner => {

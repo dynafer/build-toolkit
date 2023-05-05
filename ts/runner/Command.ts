@@ -14,7 +14,7 @@ export interface ICommandSetting {
 }
 
 export interface ICommandRunner {
-	readonly Run: (setting: ICommandSetting | ICommandSetting[]) => void,
+	Run: (setting: ICommandSetting | ICommandSetting[]) => void,
 }
 
 const CommandRunner = (): ICommandRunner => {

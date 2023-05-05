@@ -43,7 +43,8 @@ export const Watcher = (): IWatcher => {
 			return logWatching();
 		}
 
-		await update(lastChanged);
+		await update(lastChanged)
+			.catch(error => logger.Throw(error, ExitCode.FAILURE.UNEXPECTED));
 	};
 
 	const trigger = () => {
@@ -62,7 +63,7 @@ export const Watcher = (): IWatcher => {
 		toolkitInstance = toolkit;
 		runnerInstance = runner;
 
-		watch(watchPath, { ignored: /(build|lib)\//gi, ignoreInitial: true })
+		watch(watchPath, { ignored: /(build|lib|node_modules)\//gi, ignoreInitial: true })
 			.on('ready', () => logWatching())
 			.on('add', (filePath, stats) => {
 				if (stats?.size === 0) return;
@@ -70,7 +71,7 @@ export const Watcher = (): IWatcher => {
 			})
 			.on('change', trigger)
 			.on('unlink', trigger)
-			.on('error', (error) => logger.Log(`Build-Toolkit error: ${error}`, ELogColour.Red));
+			.on('error', error => logger.Log(`Build-Toolkit error: ${error}`, ELogColour.Red));
 	};
 
 	return {
