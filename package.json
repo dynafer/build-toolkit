@@ -13,7 +13,8 @@
     "build:types": "tsc -p ./tsconfig.types.json --emitDeclarationOnly",
     "build": "node build.js",
     "watch": "node build.js -w",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "test": "jest"
   },
   "devDependencies": {
     "@finer-group/eslint-plugin": "^0.0.8",
@@ -22,6 +23,7 @@
     "@types/uglify-js": "^3.17.1",
     "eslint": "^8.37.0",
     "jest-silent-reporter": "^0.5.0",
+    "ts-jest": "^29.1.0",
     "tslib": "^2.5.0",
     "typescript": "^5.0.3"
   },
