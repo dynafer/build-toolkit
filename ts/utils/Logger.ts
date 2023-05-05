@@ -38,6 +38,8 @@ const LoggerConstructor = (name: string = 'Build-Toolkit', bUseManually: boolean
 		console.clear();
 	};
 
+	const replaceColor = (text: string = '', color: string = ELogColour.Default): string => color.replace('%s', text);
+
 	const Color = (text: string = '', color: string = ELogColour.Default, current?: number, total?: number): string => {
 		const steps = current && total ? `[${current}/${total}] ` : '';
 
@@ -48,9 +50,9 @@ const LoggerConstructor = (name: string = 'Build-Toolkit', bUseManually: boolean
 			Type.Padding(currentTime.getSeconds())
 		].join(':');
 
-		const replacedText = color.replace('%s', `${steps}${name}: ${text}`);
+		const replacedText = replaceColor(`${steps}${name}: ${text}`, color);
 
-		return `[${ELogColour.Grey.replace('%s', timeString)}] ${replacedText}`;
+		return `[${replaceColor(timeString, ELogColour.Grey)}] ${replacedText}`;
 	};
 
 	const Log = (text: string = '', color: string = ELogColour.Default) => {
@@ -59,11 +61,10 @@ const LoggerConstructor = (name: string = 'Build-Toolkit', bUseManually: boolean
 	};
 
 	const Throw = (error: Error | string = '', code: number = ExitCode.FAILURE.ERROR) => {
-		if (Type.IsError(error)) {
-			console.error(error);
-		} else if (Type.IsString(error) && !Type.IsEmpty(error)) {
-			console.error(ELogColour.Red, new Error(`${name}: ${error}`));
-		}
+		if (Type.IsString(error) && !Type.IsEmpty(error))
+			error = new Error(`${name}: ${error}`);
+
+		if (Type.IsError(error)) console.error(replaceColor(error.stack ?? error.message, ELogColour.Red));
 
 		System.SetError(true);
 

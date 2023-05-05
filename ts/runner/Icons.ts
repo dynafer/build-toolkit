@@ -125,7 +125,7 @@ const Icons = (): IIconsRunner => {
 			const svgMap: Record<string, string> = {};
 			svgs.forEach(svg => {
 				if (!svg.includes('.svg')) return;
-				svgMap[svg.replace('.svg', '')] = fs.readFileSync(path.resolve(dir, svg), 'utf8');
+				svgMap[svg.replace('.svg', '')] = fs.readFileSync(path.resolve(dir, svg), 'utf8').replace(/\n/gi, '');
 			});
 
 			switch (setting.type) {

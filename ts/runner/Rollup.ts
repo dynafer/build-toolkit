@@ -15,8 +15,8 @@ export interface IRollupOptions extends InputOptions {
 }
 
 export interface IRollupRunner {
-	readonly Register: (setting: IRollupOptions | IRollupOptions[]) => void,
-	readonly Run: () => Promise<void>,
+	Register: (setting: IRollupOptions | IRollupOptions[]) => void,
+	Run: () => Promise<void>,
 }
 
 const RollupRunner = (): IRollupRunner => {

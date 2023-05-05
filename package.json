@@ -1,6 +1,6 @@
 {
   "name": "@dynafer/build-toolkit",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "repository": "https://github.com/dynafer/build-toolkit.git",
   "author": "Dynafer",
   "bin": {
@@ -11,19 +11,24 @@
     "build:commonjs": "tsc -p ./tsconfig.commonjs.json",
     "build:module": "tsc -p ./tsconfig.module.json",
     "build:types": "tsc -p ./tsconfig.types.json --emitDeclarationOnly",
-    "build": "yarn run build:commonjs && yarn run build:module && yarn run build:types",
+    "build": "node build.js",
+    "watch": "node build.js -w",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
     "@finer-group/eslint-plugin": "^0.0.8",
+    "@types/jest": "^29.5.1",
     "@types/node": "^18.15.11",
     "@types/uglify-js": "^3.17.1",
     "eslint": "^8.37.0",
+    "jest-silent-reporter": "^0.5.0",
     "tslib": "^2.5.0",
     "typescript": "^5.0.3"
   },
   "dependencies": {
     "chokidar": "^3.5.3",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
     "rollup": "^3.20.2",
     "sass": "^1.60.0",
     "uglify-js": "^3.17.4"
@@ -51,7 +56,8 @@
     "sass",
     "command",
     "task",
-    "runner"
+    "runner",
+    "jest"
   ],
   "license": "MIT"
 }

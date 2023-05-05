@@ -4,37 +4,34 @@ import IconsRunner, { IIconsRunner } from './runner/Icons';
 import RollupRunner, { IRollupRunner } from './runner/Rollup';
 import SassRunner, { ISassRunner } from './runner/Sass';
 import TaskRunner, { ITaskRunner } from './runner/Task';
+import TestRunner, { ITestRunner } from './runner/Test';
 
-export type TToolkit = (_config: IToolkitOption) => IToolkit;
+export type TToolkit = (config: IToolkitOption) => IToolkit;
 
 export interface IToolkitRunner {
-	Command: ICommandRunner,
-	Rollup: IRollupRunner,
-	Sass: ISassRunner,
-	Task: ITaskRunner,
-	Icons: IIconsRunner,
+	readonly Command: ICommandRunner,
+	readonly Icons: IIconsRunner,
+	readonly Rollup: IRollupRunner,
+	readonly Sass: ISassRunner,
+	readonly Task: ITaskRunner,
+	readonly Test: ITestRunner,
 }
 
 export interface IToolkit {
-	Runner: IToolkitRunner,
+	readonly Runner: IToolkitRunner,
 }
 
-const Toolkit = (_config: IToolkitOption): IToolkit => {
-	Configure(_config);
-
-	const Rollup: IRollupRunner = RollupRunner;
-	const Command: ICommandRunner = CommandRunner;
-	const Sass: ISassRunner = SassRunner;
-	const Task: ITaskRunner = TaskRunner;
-	const Icons: IIconsRunner = IconsRunner;
+const Toolkit = (config: IToolkitOption): IToolkit => {
+	Configure(config);
 
 	return {
 		Runner: {
-			Command,
-			Rollup,
-			Sass,
-			Task,
-			Icons,
+			Command: CommandRunner,
+			Icons: IconsRunner,
+			Rollup: RollupRunner,
+			Sass: SassRunner,
+			Task: TaskRunner,
+			Test: TestRunner,
 		}
 	};
 };

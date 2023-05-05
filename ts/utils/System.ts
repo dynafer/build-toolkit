@@ -1,11 +1,11 @@
 const System = () => {
-	const SetError = (bError: boolean): void => {
+	const SetError = (bError: boolean) => {
 		process.env.IsError = bError ? 'true' : 'false';
 	};
-	const SetLogging = (bLogging: boolean): void => {
+	const SetLogging = (bLogging: boolean) => {
 		process.env.IsLogging = bLogging ? 'true' : 'false';
 	};
-	const SetWatching = (bWatching: boolean): void => {
+	const SetWatching = (bWatching: boolean) => {
 		process.env.IsWatching = bWatching ? 'true' : 'false';
 	};
 
