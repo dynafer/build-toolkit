@@ -1,0 +1,7 @@
+{
+	"extends": "./tsconfig.shared.json",
+	"compilerOptions": {
+		"module": "ESNext"
+	},
+	"include": ["ts/**/*.ts", "test/**/*.ts"]
+}

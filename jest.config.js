@@ -2,5 +2,6 @@
 module.exports = {
 	preset: 'ts-jest',
 	testMatch: ['<rootDir>/test/All.test.ts'],
-	fakeTimers: { enableGlobally: true },
+	testEnvironment: 'jest-environment-node-single-context',
+	testTimeout: 10000,
 };
