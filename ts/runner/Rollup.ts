@@ -4,7 +4,7 @@ import { minify } from 'uglify-js';
 import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import System from '../utils/System';
-import * as Type from '../utils/Type';
+import * as Utils from '../utils/Utils';
 
 export interface IOutputOptions extends OutputOptions {
 	createUglified?: boolean,
@@ -24,7 +24,7 @@ const RollupRunner = (): IRollupRunner => {
 	const logger = LoggerConstructor('Rollup');
 
 	const minifyBundle = (outputOption: IOutputOptions, value: RollupOutput) => {
-		if (!Type.IsString(outputOption.file) || !outputOption.createUglified) return;
+		if (!Utils.IsString(outputOption.file) || !outputOption.createUglified) return;
 		for (let index = 0, length = value.output.length; index < length; ++index) {
 			const output = value.output[index];
 			if (output.type !== 'chunk') continue;
@@ -52,8 +52,8 @@ const RollupRunner = (): IRollupRunner => {
 			const outputOptions: IOutputOptions[] = [];
 
 			if (setting.output) {
-				if (Type.IsArray(setting.output)) outputOptions.push(...setting.output);
-				else if (Type.IsObject(setting.output)) outputOptions.push(setting.output);
+				if (Utils.IsArray(setting.output)) outputOptions.push(...setting.output);
+				else if (Utils.IsObject(setting.output)) outputOptions.push(setting.output);
 				else {
 					logger.Throw('Check your rollup output configuration.');
 					return Promise.resolve();
@@ -67,14 +67,14 @@ const RollupRunner = (): IRollupRunner => {
 	};
 
 	const Register = (setting: IRollupOptions | IRollupOptions[]) => {
-		if (Type.IsArray(setting)) return rollupSetting.push(...setting);
-		if (Type.IsObject(setting)) return rollupSetting.push(setting);
+		if (Utils.IsArray(setting)) return rollupSetting.push(...setting);
+		if (Utils.IsObject(setting)) return rollupSetting.push(setting);
 		logger.Throw('Check your rollup configuration.');
 	};
 
 	const Run = (): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
-		if (Type.IsEmpty(rollupSetting)) {
+		if (Utils.IsEmpty(rollupSetting)) {
 			logger.Throw('To run rollup, must register rollup before running.');
 			return Promise.resolve();
 		}

@@ -1,7 +1,7 @@
 import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import System from '../utils/System';
-import * as Type from '../utils/Type';
+import * as Utils from '../utils/Utils';
 
 export interface ITask {
 	(): Promise<void>;
@@ -21,7 +21,7 @@ const TaskRunner = (): ITaskRunner => {
 		const timer = logger.Time();
 
 		return new Promise(resolve => {
-			if (!Type.IsFunction(task)) {
+			if (!Utils.IsFunction(task)) {
 				logger.Throw('Must be an asynchronous function.');
 				return resolve();
 			}

@@ -6,7 +6,7 @@ import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import PathUtils from '../utils/PathUtils';
 import System from '../utils/System';
-import * as Type from '../utils/Type';
+import * as Utils from '../utils/Utils';
 
 export type TIconSetting = IJsonSetting | IOtherSettings;
 
@@ -49,9 +49,9 @@ const Icons = (): IIconsRunner => {
 
 	const mapToString = (map: Record<string, string>): string => {
 		const chunks: string[] = [];
-		Object.entries(map).forEach(([key, value]) => {
-			chunks.push('\t', key, ': \'', value.replace(/'/gi, '\''), '\',', '\n');
-		});
+		Object.entries(map).forEach(([key, value]) =>
+			chunks.push('\t', key, ': \'', value.replace(/'/gi, '\''), '\',', '\n')
+		);
 		return combineStringSafely(chunks);
 	};
 
@@ -96,12 +96,12 @@ const Icons = (): IIconsRunner => {
 
 	const Build = (setting: TIconSetting): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
-		if (!Type.IsObject(setting)) {
+		if (!Utils.IsObject(setting)) {
 			logger.Throw('Setting must be an object.');
 			return Promise.resolve();
 		}
 
-		if (['const', 'argument', 'module'].includes(setting.type) && (!Type.IsString(setting.naming) || Type.IsEmpty(setting.naming))) {
+		if (['const', 'argument', 'module'].includes(setting.type) && (!Utils.IsString(setting.naming) || Utils.IsEmpty(setting.naming))) {
 			logger.Throw(`${setting.type} requires naming.`);
 			return Promise.resolve();
 		}

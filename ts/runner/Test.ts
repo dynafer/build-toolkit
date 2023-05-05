@@ -4,7 +4,7 @@ import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import PathUtils from '../utils/PathUtils';
 import System from '../utils/System';
-import * as Type from '../utils/Type';
+import * as Utils from '../utils/Utils';
 
 export interface ITestRunner {
 	Run: (setting: Config.Argv) => void,
@@ -32,7 +32,7 @@ const TestRunner = (): ITestRunner => {
 
 	const Run = (setting: Config.Argv): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
-		if (!Type.IsObject(setting)) {
+		if (!Utils.IsObject(setting)) {
 			logger.Throw('Setting must be an object.');
 			return Promise.resolve();
 		}
@@ -48,7 +48,7 @@ const TestRunner = (): ITestRunner => {
 				.then(({ results }) => {
 					for (let index = 0, length = results.testResults.length; index < length; ++index) {
 						const result = results.testResults[index];
-						if (!Type.IsObject(result.testExecError)) continue;
+						if (!Utils.IsObject(result.testExecError)) continue;
 						const error = new Error();
 						error.message = result.testExecError.message;
 						if (result.testExecError.stack) error.stack = result.testExecError.stack;

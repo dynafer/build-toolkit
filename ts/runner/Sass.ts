@@ -5,7 +5,7 @@ import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import PathUtils from '../utils/PathUtils';
 import System from '../utils/System';
-import * as Type from '../utils/Type';
+import * as Utils from '../utils/Utils';
 
 export interface ISassSetting {
 	input: string,
@@ -21,7 +21,7 @@ const SassRunner = (): ISassRunner => {
 	const logger = LoggerConstructor('SASS');
 
 	const runner = (setting: ISassSetting, current?: number, total?: number): Promise<void> => {
-		if (!Type.IsString(setting.input) || !Type.IsString(setting.output)) {
+		if (!Utils.IsString(setting.input) || !Utils.IsString(setting.output)) {
 			logger.Throw('Input and output must be a string.');
 			return Promise.resolve();
 		}
@@ -52,21 +52,21 @@ const SassRunner = (): ISassRunner => {
 	const Run = (settings: ISassSetting | ISassSetting[]): Promise<void> => {
 		if (System.IsWatching() && System.IsError()) return Promise.resolve();
 
-		if (!Type.IsArray(settings) && !Type.IsObject(settings)) {
+		if (!Utils.IsArray(settings) && !Utils.IsObject(settings)) {
 			logger.Throw('Setting must be a key-value object.');
 			return Promise.resolve();
 		}
 
 		let timer = '';
 
-		if (Type.IsArray(settings)) {
+		if (Utils.IsArray(settings)) {
 			logger.Log('Compiling all the files...');
 			timer = logger.Time();
 		}
 
 		return new Promise(resolve => {
-			if (!Type.IsArray(settings)) {
-				if (!Type.IsObject(settings)) {
+			if (!Utils.IsArray(settings)) {
+				if (!Utils.IsObject(settings)) {
 					logger.Throw('Setting must be a key-value object.');
 					return resolve();
 				}
@@ -79,7 +79,7 @@ const SassRunner = (): ISassRunner => {
 			const sassList: Promise<void>[] = [];
 			for (let index = 0, length = settings.length; index < length; ++index) {
 				const setting = settings[index];
-				if (!Type.IsObject(setting)) {
+				if (!Utils.IsObject(setting)) {
 					logger.Throw('Setting must be a key-value object.');
 					return resolve();
 				}
