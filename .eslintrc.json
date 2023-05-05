@@ -4,10 +4,10 @@
 		"plugin:@finer-group/base"
 	],
 	"parserOptions": {
-		"project": "tsconfig.json",
+		"project": "tsconfig.eslint.json",
 		"sourceType": "module"
 	},
-	"ignorePatterns": ["*.js", "*.json", "build/**/*.ts", "test/**/*.ts"],
+	"ignorePatterns": ["*.js", "*.json", "build/**/*.ts"],
 	"rules": {
 		"@typescript-eslint/no-misused-promises": "off"
 	},

@@ -7,7 +7,7 @@ import System from '../utils/System';
 import * as Utils from '../utils/Utils';
 
 export interface ITestRunner {
-	Run: (setting: Config.Argv) => void,
+	Run: (setting: Config.Argv) => Promise<void>,
 }
 
 const TestRunner = (): ITestRunner => {

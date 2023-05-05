@@ -8,7 +8,7 @@ export interface ITask {
 }
 
 export interface ITaskRunner {
-	Run: (task: ITask, watch?: boolean) => void,
+	Run: (task: ITask, watch?: boolean) => Promise<void>,
 }
 
 const TaskRunner = (): ITaskRunner => {

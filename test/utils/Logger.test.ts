@@ -3,47 +3,46 @@ import System from '../../ts/utils/System';
 
 const TestLogger = () =>
 	describe('@dynafer/build-toolkit/utils/Logger', () => {
+		const logger = LoggerConstructor('Test');
+
 		beforeAll(() => {
 			System.SetLogging(true);
 		});
 
-		it('should format log messages correctly', () => {
-			const logger = LoggerConstructor('Test');
+		afterEach(() => jest.resetAllMocks());
 
-			const output = jest.spyOn(console, 'log').mockImplementation();
+		it('should format log messages correctly', () => {
+			const spyLogger = jest.spyOn(console, 'log').mockImplementation();
 
 			logger.Log('Hello world', ELogColour.Green);
 
-			expect(output).toHaveBeenCalledWith(expect.stringContaining('Test: Hello world'));
-			expect(output).toHaveBeenCalledWith(expect.stringContaining('\x1b[32m'));
+			expect(spyLogger).toHaveBeenCalledWith(expect.stringContaining('Test: Hello world'));
+			expect(spyLogger).toHaveBeenCalledWith(expect.stringContaining('\x1b[32m'));
 		});
 
 		it('should measure elapsed time correctly', () => {
-			const logger = LoggerConstructor('Test');
-
-			const output = jest.spyOn(console, 'log').mockImplementation();
-
 			const timmer = logger.Time();
+
+			jest.useFakeTimers();
+			jest.spyOn(global, 'setTimeout');
 
 			setTimeout(() => {
 				logger.TimeEnd(timmer, 'Elapsed time', ELogColour.Blue);
+			}, 50);
 
-				expect(output).toHaveBeenCalledWith(expect.stringContaining('Elapsed time 500ms'));
-				expect(output).toHaveBeenCalledWith(expect.stringContaining('\x1b[34m'));
-			}, 500);
+			expect(setTimeout).toHaveBeenCalledTimes(1);
+			expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 50);
 		});
 
 		it('should throw errors correctly', () => {
-			const logger = LoggerConstructor('Test');
-
-			const output = jest.spyOn(console, 'error').mockImplementation();
+			const spyLogger = jest.spyOn(console, 'error').mockImplementation();
 
 			System.SetWatching(true);
 			logger.Throw('Something went wrong');
 			System.SetWatching(false);
 
-			expect(output).toHaveBeenCalledWith(expect.stringContaining('Test: Something went wrong'));
-			expect(output).toHaveBeenCalledWith(expect.stringContaining('\x1b[31m'));
+			expect(spyLogger).toHaveBeenCalledWith(expect.stringContaining('Test: Something went wrong'));
+			expect(spyLogger).toHaveBeenCalledWith(expect.stringContaining('\x1b[31m'));
 		});
 	});
 

@@ -14,7 +14,7 @@ export interface ICommandSetting {
 }
 
 export interface ICommandRunner {
-	Run: (setting: ICommandSetting | ICommandSetting[]) => void,
+	Run: (setting: ICommandSetting | ICommandSetting[]) => Promise<void>,
 }
 
 const CommandRunner = (): ICommandRunner => {

@@ -14,7 +14,7 @@ export interface ISassSetting {
 }
 
 export interface ISassRunner {
-	Run: (setting: ISassSetting | ISassSetting[]) => void,
+	Run: (setting: ISassSetting | ISassSetting[]) => Promise<void>,
 }
 
 const SassRunner = (): ISassRunner => {
