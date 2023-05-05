@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import ExitCode from './ExitCode';
 import System from './System';
-import * as Type from './Type';
+import * as Utils from './Utils';
 
 export enum ELogColour {
 	Default = '%s',
@@ -45,9 +45,9 @@ const LoggerConstructor = (name: string = 'Build-Toolkit', bUseManually: boolean
 
 		const currentTime = new Date();
 		const timeString = [
-			Type.Padding(currentTime.getHours()),
-			Type.Padding(currentTime.getMinutes()),
-			Type.Padding(currentTime.getSeconds())
+			Utils.Padding(currentTime.getHours()),
+			Utils.Padding(currentTime.getMinutes()),
+			Utils.Padding(currentTime.getSeconds())
 		].join(':');
 
 		const replacedText = replaceColor(`${steps}${name}: ${text}`, color);
@@ -61,10 +61,10 @@ const LoggerConstructor = (name: string = 'Build-Toolkit', bUseManually: boolean
 	};
 
 	const Throw = (error: Error | string = '', code: number = ExitCode.FAILURE.ERROR) => {
-		if (Type.IsString(error) && !Type.IsEmpty(error))
+		if (Utils.IsString(error) && !Utils.IsEmpty(error))
 			error = new Error(`${name}: ${error}`);
 
-		if (Type.IsError(error)) console.error(replaceColor(error.stack ?? error.message, ELogColour.Red));
+		if (Utils.IsError(error)) console.error(replaceColor(error.stack ?? error.message, ELogColour.Red));
 
 		System.SetError(true);
 
@@ -80,7 +80,7 @@ const LoggerConstructor = (name: string = 'Build-Toolkit', bUseManually: boolean
 	};
 
 	const TimeEnd = (uuid: string, label: string = '', color: string = ELogColour.Default, current?: number, total?: number) => {
-		if (!isLogging() || Type.IsEmpty(uuid) || !timers[uuid]) return;
+		if (!isLogging() || Utils.IsEmpty(uuid) || !timers[uuid]) return;
 		const currentTime = new Date().getTime();
 		const milliseconds = new Date(currentTime - timers[uuid]).getTime();
 		delete timers?.[uuid];

@@ -26,7 +26,7 @@ export const IsBoolean: (value: unknown) => value is boolean = isType('boolean')
 export const IsFunction: (value: unknown) => value is () => void = isType('function');
 export const IsError: (value: unknown) => value is Error = isInstanceOf(Error);
 
-export const IsEmpty: (value: unknown) => boolean = (value) => (IsString(value) || IsArray(value)) && value.length === 0;
+export const IsEmpty: (value: unknown) => boolean = (value: unknown) => (IsString(value) || IsArray(value)) && value.length === 0;
 
 export const Padding = (value: number | string, length: number = 2, pad: number | string = '0') =>
 	value.toString().padStart(length, pad.toString());

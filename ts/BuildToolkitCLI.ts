@@ -8,7 +8,7 @@ import ExitCode from './utils/ExitCode';
 import { LoggerConstructor } from './utils/Logger';
 import PathUtils from './utils/PathUtils';
 import System from './utils/System';
-import * as Type from './utils/Type';
+import * as Utils from './utils/Utils';
 
 export type TRunner = (runner: IToolkitRunner, config: IToolkitConfiguration) => Promise<void>;
 
@@ -16,7 +16,7 @@ export const BuildToolkitCLI = () => {
 	const logger = LoggerConstructor();
 	const options = Arg.GetOptions();
 
-	System.SetWatching(Type.IsString(options.watch) && !Type.IsEmpty(options.watch));
+	System.SetWatching(Utils.IsString(options.watch) && !Utils.IsEmpty(options.watch));
 	System.SetLogging(!System.IsWatching());
 
 	if (!options.config) options.config = 'build.config.js';

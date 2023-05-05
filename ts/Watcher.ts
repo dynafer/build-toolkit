@@ -7,7 +7,7 @@ import { IToolkit } from './Toolkit';
 import ExitCode from './utils/ExitCode';
 import { ELogColour, LoggerConstructor } from './utils/Logger';
 import System from './utils/System';
-import * as Type from './utils/Type';
+import * as Utils from './utils/Utils';
 
 export interface IWatcher {
 	Register: (toolkit: IToolkit, runner: TRunner) => void,
@@ -59,7 +59,7 @@ export const Watcher = (): IWatcher => {
 	};
 
 	const Register = (toolkit: IToolkit, runner: TRunner) => {
-		if (!Type.IsObject(toolkit) || !Type.IsFunction(runner)) logger.Throw('Runner must be a function.');
+		if (!Utils.IsObject(toolkit) || !Utils.IsFunction(runner)) logger.Throw('Runner must be a function.');
 		toolkitInstance = toolkit;
 		runnerInstance = runner;
 

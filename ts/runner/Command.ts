@@ -5,7 +5,7 @@ import ExitCode from '../utils/ExitCode';
 import { ELogColour, LoggerConstructor } from '../utils/Logger';
 import PathUtils from '../utils/PathUtils';
 import System from '../utils/System';
-import { IsArray, IsObject, IsString } from '../utils/Type';
+import { IsArray, IsObject, IsString } from '../utils/Utils';
 
 export interface ICommandSetting {
 	cd?: string,
