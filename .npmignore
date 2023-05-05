@@ -3,3 +3,5 @@ ts
 tsconfig.json
 logs
 build.js
+test
+jest.config.js

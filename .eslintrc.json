@@ -7,7 +7,7 @@
 		"project": "tsconfig.json",
 		"sourceType": "module"
 	},
-	"ignorePatterns": ["*.js", "*.json", "build/**/*.ts"],
+	"ignorePatterns": ["*.js", "*.json", "build/**/*.ts", "test/**/*.ts"],
 	"rules": {
 		"@typescript-eslint/no-misused-promises": "off"
 	},

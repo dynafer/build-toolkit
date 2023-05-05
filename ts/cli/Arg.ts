@@ -1,3 +1,7 @@
+export interface IArg {
+	GetOptions: () => Record<string, string>,
+}
+
 const ARGS: Record<string, Record<string, string>> = {
 	'-c': {
 		type: 'config',
@@ -92,7 +96,7 @@ const ArgConstructor = () => {
 	};
 
 	return {
-		GetOptions
+		GetOptions,
 	};
 };
 
