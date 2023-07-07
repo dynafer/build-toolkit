@@ -266,3 +266,6 @@ module.exports = async (runner, config) => {
   ...
 };
 ```
+
+## License
+[MIT](https://github.com/dynafer/build-toolkit/blob/main/LICENSE.txt)

@@ -1,6 +1,6 @@
 {
   "name": "@dynafer/build-toolkit",
-  "version": "1.0.62",
+  "version": "1.0.63",
   "repository": "https://github.com/dynafer/build-toolkit.git",
   "author": "Dynafer",
   "bin": {
