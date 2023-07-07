@@ -1,6 +1,6 @@
 {
   "name": "@dynafer/build-toolkit",
-  "version": "1.0.63",
+  "version": "1.0.64",
   "repository": "https://github.com/dynafer/build-toolkit.git",
   "author": "Dynafer",
   "bin": {
@@ -17,23 +17,23 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@finer-group/eslint-plugin": "^0.0.9",
-    "@types/jest": "^29.5.1",
-    "@types/node": "^20.1.1",
+    "@dynafer/eslint-plugin": "^0.0.2",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.4.0",
     "@types/uglify-js": "^3.17.1",
-    "eslint": "^8.40.0",
-    "ts-jest": "^29.1.0",
-    "tslib": "^2.5.0",
-    "typescript": "^5.0.4"
+    "eslint": "^8.44.0",
+    "ts-jest": "^29.1.1",
+    "tslib": "^2.6.0",
+    "typescript": "^5.1.6"
   },
   "dependencies": {
     "chokidar": "^3.5.3",
-    "jest": "^29.5.0",
-    "jest-environment-jsdom": "^29.5.0",
+    "jest": "^29.6.1",
+    "jest-environment-jsdom": "^29.6.1",
     "jest-environment-node-single-context": "^29.1.0",
     "jest-silent-reporter": "^0.5.0",
-    "rollup": "^3.21.5",
-    "sass": "^1.62.1",
+    "rollup": "^3.26.2",
+    "sass": "^1.63.6",
     "uglify-js": "^3.17.4"
   },
   "main": "build/lib/BuildToolkit.js",
